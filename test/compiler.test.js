@@ -1,5 +1,5 @@
 import * as assert from "node:assert"
-import { compile } from "../src/compiler.js"
+import { compile } from "../src/banana.js"
 
 describe("Compiler", () => {
     it("should compile", () => {
