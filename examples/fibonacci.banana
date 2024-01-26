@@ -1,0 +1,6 @@
+
+pick fibonacci(int n):
+    if (n <= 1):
+        serve n
+    else:
+        serve fibonacci(n-1) + fibonacci(n-2)
