@@ -1,4 +1,4 @@
-![Getting Started](./bananaLogo.png =30x30)
+![Getting Started](./bananaLogo.png)
 
 # Banana 
 
