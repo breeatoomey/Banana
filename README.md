@@ -198,4 +198,4 @@ person1.greet() // // Output: Hello, my name is Alice!
 </table>
 ```
 
-### Authors: Breea Toomey, Caroline Ellis, Denali Tonn, Dylan Krim, Maddie Mcdowel
+### Authors: Breea Toomey, Caroline Ellis, Denali Tonn, Dylan Krim, Maddie Mcdowell
