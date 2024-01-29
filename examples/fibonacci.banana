@@ -1,5 +1,4 @@
-
-pick fibonacci(int n):
+pick fibonacci(Int n) -> Int:
     if (n <= 1):
         serve n
     else:
