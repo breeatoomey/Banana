@@ -189,7 +189,7 @@ model Person:
         plant('Hello, my name is \<self.name>!')
 
 let person1 = Person('Alice', 30)
-person1.greet() // // Output: Hello, my name is Alice!
+person1.greet() // Output: Hello, my name is Alice!
 
 ```
 
