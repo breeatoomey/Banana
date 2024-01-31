@@ -5,4 +5,11 @@ describe("Compiler", () => {
     it("should compile", () => {
         assert.equal(compile(), "eventually this will return compiled code");
     })
-})
+});
+    
+describe("Equality Test", () => {
+    it("should assert that 1 === 1", () => {
+        assert.equal(1, 1);
+    })
+});
+

@@ -1,8 +1,8 @@
 {
   "name": "banana",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A compiler for the Banana language.",
+  "main": "banana.js",
   "directories": {
     "test": "test"
   },
@@ -14,14 +14,18 @@
     "type": "git",
     "url": "git+https://github.com/breeatoomey/Banana.git"
   },
-  "keywords": [],
+  "keywords": [
+    "compiler",
+    "ohm"
+  ],
   "author": "Breea Toomey, Caroline Ellis, Denali Tonn, Maddie Mcdowell, Dylan Krim",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/breeatoomey/Banana/issues"
   },
   "homepage": "https://github.com/breeatoomey/Banana#readme",
   "dependencies": {
+    "ohm": "^0.10.4",
     "ohm-js": "^17.1.0"
   },
   "devDependencies": {
