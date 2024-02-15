@@ -25,7 +25,6 @@
   },
   "homepage": "https://github.com/breeatoomey/Banana#readme",
   "dependencies": {
-    "ohm": "^0.10.4",
     "ohm-js": "^17.1.0"
   },
   "devDependencies": {
