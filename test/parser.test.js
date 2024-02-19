@@ -18,6 +18,8 @@ const syntaxChecks = [
   ["ifelif statement", "if banana == rotten: plant('bad banana') elif banana == ripe: plant('good banana')"],
   ["array declaration", "let Bunch(Boo) my-bananas = (ripe, rotten)"],
   ["for loop", "for banana in tree: plant('love')"],
+  ["model declaration", "model Banana: config(Boo ripeness): self.ripeness = ripeness"],
+  ["model instantiation", "let Banana my-banana = Banana(ripe)"],
 ]
 
 //TODO: Add tests
@@ -45,7 +47,7 @@ const syntaxErrors = [
   ["use of double quotes", "let String bad-string = \"bad banana\"", /Line 1, col 25/],
   ["if statement without body", "if x:", /Line 1, col 6/],
   ["assignment without variable name", "= 5", /Line 1, col 1/],
-  ["missing type", "let my-banana = 'yummy'", /Line 1, col 5/],
+  ["missing type", "let my-banana = 'yummy'", /Line 1, col 15/],
   ["missing keyword", "Int banana-count = 77", /Line 1, col 1/],
   ["unrecognized keyword", "y = switch", /Line 1, col 3/],
   ["missing functon return type", "func myFunction() -> : ", /Line 1, col 6/],
