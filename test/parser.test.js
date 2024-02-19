@@ -20,6 +20,7 @@ const syntaxChecks = [
   ["for loop", "for banana in tree: plant('love')"],
   ["model declaration", "model Banana: config(Boo ripeness): self.ripeness = ripeness"],
   ["model instantiation", "let Banana my-banana = Banana(ripe)"],
+  ["method call", "my-banana.eat()"],
 ]
 
 //TODO: Add tests
