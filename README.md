@@ -1,4 +1,4 @@
-![Getting Started](./bananaLogo.png)
+![Getting Started](./docs/bananaLogo.png)
 
 # Banana
 
