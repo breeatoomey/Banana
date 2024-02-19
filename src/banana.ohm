@@ -1,1 +1,112 @@
-// Grammar goes here 
+Banana {
+  Program = Stmt+
+  Stmt = VarDecl
+  	   | FunDecl
+       | Assignment
+       | CallStmt
+       | IfStmt
+       | WhileStmt
+       | ForStmt
+       | ReturnStmt
+       | BreakStmt
+       | ContinueStmt
+       | TryStmt
+       | PrintStmt
+  VarDecl = let Type id "=" Exp
+  FunDecl = func id "(" Params ")" "->" Type ":" Body
+  Params = ListOf<Param, ",">
+  Param = Type id ("=" Exp)?
+  Body = Stmt+
+  Type = array "(" Type ")"   -- array
+       | boolean              -- boolean
+       | void                 -- void
+       | int                  -- int
+       | string               -- string
+  Assignment = let Type id "=" Exp
+  BreakStmt = break
+  ContinueStmt = continue
+  ReturnStmt = return Exp
+  CallStmt = Call
+  ForStmt = for id in Exp ":" Body
+  PrintStmt = print "(" Exp? ")"
+  			
+  WhileStmt = while Exp ":" Body
+  IfStmt = if Exp ":" Body elif Exp ":" Body  -- elif
+  	     | if Exp ":" Body else ":" Body      -- with_else
+         | if Exp ":" Body else ":" IfStmt    -- nested_if
+         | if Exp ":" Body                    -- plain_if
+  TryStmt = try Body Catch* Finally?
+  Catch = catch "(" Type id ")" Body
+  Finally = "finally" Body
+  Call = id "(" Args ")"
+  Args = ListOf<Exp, ",">
+  Exp       = ("-" | "!") Exp7                              -- unary 									
+            | Exp1 "?" "->" Exp1 "->>" Exp                  -- ternary
+            | Exp1
+  Exp1      = Exp1 "||" Exp2                                -- binary
+            | Exp2
+  Exp2      = Exp2 "&&" Exp3                                -- binary
+            | Exp3
+  Exp3      = Exp4 ("<="|"<"|"=="|"!="|">="|">") Exp4       -- binary
+            | Exp4
+  Exp4      = Exp4 ("+" | "-") Exp5                         -- binary
+            | Exp5
+  Exp5      = Exp5 ("*" | "/" | "%") Exp6                   -- binary
+            | Exp6
+  Exp6      = Exp7 "**" Exp6                                -- binary
+            | Exp7
+  Exp7      = "(" NonemptyListOf<Exp, ","> ")"             --arrayexp
+            |"(" Exp ")"                                   -- parens
+            | num
+            | true               							-- true
+            | false											-- false
+            | Call                                          -- call
+            | id "!"?                                       -- id
+            | stringlit                                     -- string
+  relop = "<=" | "<" | ">=" | ">" | "==" | "!="
+  access = public | private
+  string = "String" ~idchar
+  int = "Int" ~idchar
+  print = "Plant" ~idchar
+  boolean = "Boo" ~idchar
+  array = "Bunch" ~idchar
+  func = "pick" ~idchar
+  let = "let" ~idchar
+  struct = "struct" ~idchar
+  enum = "enum" ~idchar
+  while = "while" ~idchar
+  if = "if" ~idchar
+  else = "else" ~idchar
+  elif = "elif" ~idchar
+  switch = "switch" ~idchar
+  case = "case" ~idchar
+  default = "default" ~idchar
+  return = "serve" ~idchar
+  break = "break" ~idchar
+  continue = "continue" ~idchar
+  try = "try" ~idchar
+  catch = "catch" ~idchar
+  throw = "throw" ~idchar
+  repeat = "repeat" ~idchar
+  for = "for" ~idchar
+  void = "Nothing" ~idchar
+  null = "null" ~idchar
+  true = "ripe" ~idchar
+  false = "rotten" ~idchar
+  in = "in" ~idchar
+  ctor = "constructor" ~idchar
+  public = "public" ~idchar
+  private = "private" ~idchar
+  keyword = string | int | print | boolean | array | func | let | struct
+          | enum | while | if | else | switch | case | default | return
+          | break | continue | try | catch | throw | repeat | for | void
+          | null | true | false | in | ctor | public | private
+  id = ~keyword letter idchar*
+  idchar = alnum | "-"
+  num = digit+ ("." digit+)? (("e" | "E") ("+" | "-")? digit+)?
+  stringlit = "\'" char* "\'"
+  char = "\\u{" hexDigit+ "}"   --codepoint
+       | "\\" any               --nonbackslash
+       | ~"\'" any
+  space += "//" (~"\n" any)*  --comment
+}
