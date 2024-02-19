@@ -1,4 +1,4 @@
- 
- export default function analyze() {
-    throw new Error("Not yet implemented")
-  }
+
+export default function analyze() {
+  throw new Error("Not yet implemented")
+}
