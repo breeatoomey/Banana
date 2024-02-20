@@ -37,10 +37,11 @@ Banana {
   
   ForStmt = for id in Exp ":" Body
   WhileStmt = while Exp ":" Body
-  IfStmt = if Exp ":" Body elif Exp ":" Body  -- elif
-  	    | if Exp ":" Body else ":" Body      -- with_else
-         | if Exp ":" Body else ":" IfStmt    -- nested_if
-         | if Exp ":" Body                    -- plain_if
+  IfStmt = if Exp ":" Body elif Exp ":" Body else ":" Body  -- elif_with_else
+         | if Exp ":" Body elif Exp ":" Body                -- elif
+  	    | if Exp ":" Body else ":" Body                    -- with_else
+         | if Exp ":" Body else ":" IfStmt                  -- nested_if
+         | if Exp ":" Body                                  -- plain_if
          
 
   Call = id "(" Args ")"

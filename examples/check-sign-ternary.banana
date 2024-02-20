@@ -1,0 +1,3 @@
+pick check-sign(Int num) -> String:
+    let Boo result = (num > 0)? -> 'Positive' ->> 'Negative'
+    serve result
