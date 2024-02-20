@@ -11,10 +11,11 @@
 - Static Typing
 - Object Oriented
 - Modeling
-- Built-in methods
+- Intrinsic methods
 - Nesting
-- Loops
+- Loops (For, While)
 - Syntactic distinctions between variable references
+- Function Composition
 
 ### Types/Keywords:
 
