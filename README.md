@@ -11,12 +11,13 @@
 - Static Typing
 - Object Oriented
 - Modeling
-- Built-in methods
+- Intrinsic methods
 - Nesting
-- Loops
+- Loops (For, While)
 - Syntactic distinctions between variable references
+- Function Composition
 
-### Types/Keywords:
+### Types/Keywords:                                
 
 |      JavaScript      |      Banana       |
 | :------------------: | :---------------: |
@@ -26,8 +27,19 @@
 |        class         |       model       |
 |     constructor      |      config       |
 |       function       |       pick        |
-|        print         |       plant       |
 |        return        |       serve       |
+|        else if       |       elif        |
+
+ ### Intrinsic Methods:
+|      JavaScript                   |      Banana              |
+| :------------------:              | :---------------:        |
+| string.split(separator, limit)    | String.peel(separator)   |
+| console.log()                     | plant()                  |
+
+### Special Operators:
+|      JavaScript       |      Banana             |
+| :------------------:  | :---------------:       |
+| cond ? exp1 : exp2    | cond? -> exp1 ->> exp2  |
 
 ### Examples:
 
@@ -194,8 +206,69 @@ person1.greet() // Output: Hello, my name is Alice!
 ```
 
 </td>
+</table>
+
+#### Positive or Negative with Ternary
+<table>
+<tr>
+<td> JavaScript </td> <td> Banana </td>
+</tr>
+<tr>
+<td>
+
+```javascript
+function checkSign(number) {
+    var result = (number >= 0) ? "Positive" : "Negative";
+    return result;
+}
+````
+
+</td>
+<td>
+    
+```
+pick check-sign(Int num) -> String:
+    let Boo result = (num > 0)? -> 'Positive' ->> 'Negative'
+    serve result
+```
+
+</td>
 </tr>
 </table>
+
+#### Elif Statement
+<table>
+<tr>
+<td> JavaScript </td> <td> Banana </td>
+</tr>
+<tr>
+<td>
+
+```javascript
+if (number > 0) {
+    console.log("Number is positive");
+} else if (number < 0) {
+    console.log("Number is negative");
+} else {
+    console.log("Number is zero");
+}
+````
+
+</td>
+<td>
+    
 ```
+if num > 0:
+    plant('Number is positive')
+elif num < 0:
+    plant('Number is negative')
+else:
+    plant('Number is zero')
+```
+
+</td>
+</tr>
+</table>
+
 
 ### Authors: Breea Toomey, Caroline Ellis, Denali Tonn, Dylan Krim, Maddie Mcdowell
