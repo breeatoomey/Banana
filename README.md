@@ -17,7 +17,7 @@
 - Syntactic distinctions between variable references
 - Function Composition
 
-### Types/Keywords:
+### Types/Keywords:                                
 
 |      JavaScript      |      Banana       |
 | :------------------: | :---------------: |
@@ -27,8 +27,18 @@
 |        class         |       model       |
 |     constructor      |      config       |
 |       function       |       pick        |
-|        print         |       plant       |
 |        return        |       serve       |
+
+ ### Intrinsic Methods:
+|      JavaScript                   |      Banana              |
+| :------------------:              | :---------------:        |
+| string.split(separator, limit)    | String.peel(separator)   |
+| console.log()                     | plant()                  |
+
+### Special Operators:
+|      JavaScript       |      Banana             |
+| :------------------:  | :---------------:       |
+| cond ? exp1 : exp2    | cond? -> exp1 ->> exp2  |
 
 ### Examples:
 
@@ -192,6 +202,32 @@ model Person:
 let Person person1 = Person('Alice', 30)
 person1.greet() // Output: Hello, my name is Alice!
 
+```
+
+</td>
+
+#### Positive or Negative with Ternary
+<table>
+<tr>
+<td> JavaScript </td> <td> Banana </td>
+</tr>
+<tr>
+<td>
+
+```javascript
+function checkSign(number) {
+    var result = (number >= 0) ? "Positive" : "Negative";
+    return result;
+}
+````
+
+</td>
+<td>
+    
+```
+pick check-sign(Int num) -> String:
+    let Boo result = (num > 0)? -> 'Positive' ->> 'Negative'
+    serve result
 ```
 
 </td>
