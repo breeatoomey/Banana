@@ -28,6 +28,7 @@ Banana {
 
   Assignment = let Type id "=" Exp  -- vardecl
   			 | self "." id "=" Exp  -- membervar
+                | id "=" Exp           -- reassignment
              
   ReturnStmt = return Exp 
   CallStmt = Call                -- funcall
