@@ -28,6 +28,7 @@
 |     constructor      |      config       |
 |       function       |       pick        |
 |        return        |       serve       |
+|        else if       |       elif        |
 
  ### Intrinsic Methods:
 |      JavaScript                   |      Banana              |
@@ -229,6 +230,40 @@ function checkSign(number) {
 pick check-sign(Int num) -> String:
     let Boo result = (num > 0)? -> 'Positive' ->> 'Negative'
     serve result
+```
+
+</td>
+</tr>
+</table>
+
+#### Elif Statement
+<table>
+<tr>
+<td> JavaScript </td> <td> Banana </td>
+</tr>
+<tr>
+<td>
+
+```javascript
+if (number > 0) {
+    console.log("Number is positive");
+} else if (number < 0) {
+    console.log("Number is negative");
+} else {
+    console.log("Number is zero");
+}
+````
+
+</td>
+<td>
+    
+```
+if num > 0:
+    plant('Number is positive')
+elif num < 0:
+    plant('Number is negative')
+else:
+    plant('Number is zero')
 ```
 
 </td>
