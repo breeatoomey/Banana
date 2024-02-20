@@ -205,6 +205,7 @@ person1.greet() // Output: Hello, my name is Alice!
 ```
 
 </td>
+</table>
 
 #### Positive or Negative with Ternary
 <table>
