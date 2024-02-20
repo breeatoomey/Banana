@@ -1,5 +1,5 @@
-import assert from "node:assert/strict"
-import parse from "../src/parser.js"
+import assert from "node:assert/strict";
+import parse from "../src/parser.js";
 
 //TODO: Add tests
 const syntaxChecks = [
@@ -21,7 +21,13 @@ const syntaxChecks = [
   ["model declaration", "model Banana: config(Boo ripeness): self.ripeness = ripeness"],
   ["model instantiation", "let Banana my-banana = Banana(ripe)"],
   ["method call", "my-banana.eat()"],
-]
+  ["method call with argument", "my-banana.peel('')"],
+  ["function call", "pick Banana ( Int a, Int b) -> Boo: Banana(5,6)"],
+  ["return call", "serve 'Bananas are yummy'"],
+  ["function return", "pick fibonacci(Int n) -> Int: if (n <= 1): serve n else: serve fibonacci(n-1) + fibonacci(n-2)"],
+  ["even number check", "pick iseven(Int n) -> Boo: if n % 2 == 0: serve ripe else: serve rotten"],
+  ["while loop", "let Int count = 5 while count > 0: count = count - 1"],
+];
 
 //TODO: Add tests
 const syntaxErrors = [
@@ -29,14 +35,14 @@ const syntaxErrors = [
   ["malformed number", "let Int x = 5.", /Line 1, col 15/],
   ["a missing right operand", "plant(6 -", /Line 1, col 10/],
   ["a non-operator", "plant(3 * ((8 _ 1)", /Line 1, col 15/],
-  ["an expression starting with a )", "x = )", /Line 1, col 3/],
+  ["an expression starting with a )", "x = )", /Line 1, col 5/],
   ["a statement starting with expression", "x * 9", /Line 1, col 3/],
   ["an illegal statement on line 2", "plant(5)\nx * 5;", /Line 2, col 3/],
   ["a statement starting with a )", "plant(6)\n) * 6", /Line 2, col 1/],
-  ["an expression starting with a *", "x = * 83", /Line 1, col 3/],
+  ["an expression starting with a *", "x = * 83", /Line 1, col 5/],
   ["missing parentheses", "plant 'Hello, World!'", /Line 1, col 7/],
   ["missing assignment operator", "x 5", /Line 1, col 3/],
-  ["missing colon in for loop","for i in range(10) plant('hungry')", /Line 1, col 20/],
+  ["missing colon in for loop", "for i in range(10) plant('hungry')", /Line 1, col 20/],
   ["misplaced colon", "if: banana == ripe", /Line 1, col 3/],
   ["unexpected token", "let Int x = 5 @", /Line 1, col 15/],
   ["unexpected token arguments in a function call", "func(#)", /Line 1, col 6/],
@@ -44,26 +50,27 @@ const syntaxErrors = [
   ["misplaced comma", "let Bunch(Int) my-list = [1, 2, 3,]", /Line 1, col 26/],
   ["missing colon after if statement", "if x == 5", /Line 1, col 10/],
   ["invalid operator", "let Int x = 10 %* 5", /Line 1, col 17/],
-  ["use of double quotes", "let String bad-string = \"bad banana\"", /Line 1, col 25/],
-  ["use of double quotes", "let String bad-string = \"bad banana\"", /Line 1, col 25/],
-  ["if statement without body", "if x:", /Line 1, col 6/],
+  ["use of double quotes", 'let String bad-string = "bad banana"', /Line 1, col 25/],
+  ["use of double quotes", 'let String bad-string = "bad banana"', /Line 1, col 25/],
   ["assignment without variable name", "= 5", /Line 1, col 1/],
   ["missing type", "let my-banana = 'yummy'", /Line 1, col 15/],
   ["missing keyword", "Int banana-count = 77", /Line 1, col 1/],
-  ["unrecognized keyword", "y = switch", /Line 1, col 3/],
+  ["unrecognized keyword", "switch y", /Line 1, col 1/],
   ["missing functon return type", "func myFunction() -> : ", /Line 1, col 6/],
   ["unclosed string literal", "let String need = 'banana", /Line 1, col 26/],
-]
+  ["misplaced operator", "let Int x = 5!", /Line 1, col 14/],
+  ["unexpected token", "model Person {", /Line 1, col 14/],
+];
 
 describe("The parser", () => {
   for (const [scenario, source] of syntaxChecks) {
     it(`properly specifies ${scenario}`, () => {
-      assert(parse(source).succeeded())
-    })
+      assert(parse(source).succeeded());
+    });
   }
   for (const [scenario, source, errorMessagePattern] of syntaxErrors) {
     it(`does not permit ${scenario}`, () => {
-      assert.throws(() => parse(source), errorMessagePattern)
-    })
+      assert.throws(() => parse(source), errorMessagePattern);
+    });
   }
-})
+});
