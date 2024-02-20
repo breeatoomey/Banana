@@ -12,7 +12,7 @@ Banana {
        | PrintStmt
   
   FunDecl = func id "(" Params ")" "->" Type ":" Body
-  ModelDecl = model id ":" Config? (Assignment | FunDecl)*
+  ModelDecl = model id ":" Config (Assignment | FunDecl)*
   Config = config "(" Params ")" ":" Body
 
   Params = ListOf<Param, ",">
@@ -26,19 +26,19 @@ Banana {
        | string               -- string
        | id                   -- modeltype
 
-  Assignment = let Type id "=" Exp  -- vardecl
-  			 | self "." id "=" Exp  -- membervar
-                | id "=" Exp           -- reassignment
+  Assignment = let Type id "=" (CallStmt | Exp)  -- vardecl
+  			 | self "." id "=" Exp            -- membervar
+                | id "=" Exp                     -- reassignment
              
   ReturnStmt = return Exp 
   CallStmt = Call                -- funcall
-  		   | id "." Call         -- methodcall
+  		   | id ("." Call)+    -- methodcall
   PrintStmt = print "(" Exp? ")"
   
   ForStmt = for id in Exp ":" Body
   WhileStmt = while Exp ":" Body
   IfStmt = if Exp ":" Body elif Exp ":" Body  -- elif
-  	     | if Exp ":" Body else ":" Body      -- with_else
+  	    | if Exp ":" Body else ":" Body      -- with_else
          | if Exp ":" Body else ":" IfStmt    -- nested_if
          | if Exp ":" Body                    -- plain_if
          
@@ -61,14 +61,14 @@ Banana {
             | Exp6
   Exp6      = Primitive "**" Exp6                                -- binary
             | Primitive
-  Primitive = "(" NonemptyListOf<Exp, ","> ")"             --arrayexp
+  Primitive = "(" NonemptyListOf<Exp, ","> ")"             -- arrayexp
             |"(" Exp ")"                                   -- parens
-            | num                                           -- num
-            | true               							-- true
-            | false											-- false
-            | Call                                          -- call
-            | id "!"?                                       -- id
-            | stringlit                                     -- string
+            | num                                          -- num
+            | true               					    -- true
+            | false								    -- false
+            | CallStmt                                     -- call
+            | id "!"?                                      -- id
+            | stringlit                                    -- string
             
 
 

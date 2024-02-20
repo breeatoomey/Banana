@@ -27,6 +27,15 @@ const syntaxChecks = [
   ["function return", "pick fibonacci(Int n) -> Int: if (n <= 1): serve n else: serve fibonacci(n-1) + fibonacci(n-2)"],
   ["even number check", "pick iseven(Int n) -> Boo: if n % 2 == 0: serve ripe else: serve rotten"],
   ["while loop", "let Int count = 5 while count > 0: count = count - 1"],
+  ["unary postfix dereference operator", "plant(banana!)"],
+  ["variable declaration from method call", "let Bunch(String) words = sentence.peel(' ')"],
+  ["variable declaration from function call", "let Int x = add(3, 4)"],
+  ["expression as argument in function call", "fibonacci(5 + 2)"],
+  ["function composition", "plant(fibonacci(7))"],
+  ["multi function composition", "plant(fibonacci(add(5, 7)))"],
+  ["function composition with method call", "plant(banana.peel(' '))"],
+  ["function composition with multiple method calls", "plant(banana.peel(' ').eat())"],
+  ["variable assignment with multiple method calls", "let Boo ate = banana.peel().eat()"]
 ];
 
 //TODO: Add tests
@@ -60,6 +69,7 @@ const syntaxErrors = [
   ["unclosed string literal", "let String need = 'banana", /Line 1, col 26/],
   ["misplaced operator", "let Int x = 5!", /Line 1, col 14/],
   ["unexpected token", "model Person {", /Line 1, col 14/],
+  ["missing config", "model Banana: pick eat() -> String: serve 'yummy'", /Line 1, col 15/],
 ];
 
 describe("The parser", () => {
