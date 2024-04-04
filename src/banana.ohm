@@ -1,8 +1,8 @@
 Banana {
   Program = Stmt+
-  
-  Stmt = FunDecl
-  	  | ModelDecl
+
+  Stmt = VarDecl
+       | FunDecl
        | Assignment 
        | CallStmt 
        | IfStmt 
@@ -10,10 +10,10 @@ Banana {
        | ForStmt
        | ReturnStmt
        | PrintStmt
-  
+
+  VarDecl = let Type id "=" Exp
   FunDecl = func id "(" Params ")" "->" Type ":" Body
-  ModelDecl = model id ":" Config (Assignment | FunDecl)*
-  Config = config "(" Params ")" ":" Body
+  
 
   Params = ListOf<Param, ",">
   Param = Type id ("=" Exp)?
@@ -26,23 +26,20 @@ Banana {
        | string               -- string
        | id                   -- modeltype
 
-  Assignment = let Type id "=" Exp      -- vardecl
-  		   | self "." id "=" Exp      -- membervar
-             | id "=" Exp               -- reassignment
-             
+  Assignment = id "=" Exp               -- reassignment
+
   ReturnStmt = return Exp 
   CallStmt = Call                -- funcall
-  		   | id ("." Call)+    -- methodcall
   PrintStmt = print "(" Exp? ")"
-  
+
   ForStmt = for id in Exp ":" Body
   WhileStmt = while Exp ":" Body
   IfStmt = if Exp ":" Body elif Exp ":" Body else ":" Body  -- elif_with_else
          | if Exp ":" Body elif Exp ":" Body                -- elif
-  	    | if Exp ":" Body else ":" Body                    -- with_else
+        | if Exp ":" Body else ":" Body                    -- with_else
          | if Exp ":" Body else ":" IfStmt                  -- nested_if
          | if Exp ":" Body                                  -- plain_if
-         
+
 
   Call = id "(" Args ")"
   Args = ListOf<Exp, ",">
@@ -70,11 +67,11 @@ Banana {
             | CallStmt                                     -- call
             | id "!"?                                      -- id
             | stringlit                                    -- string
-            
+
 
 
   relop = "<=" | "<" | ">=" | ">" | "==" | "!="
-  
+
   string = "String" ~idchar 
   int = "Int" ~idchar
   print = "Plant" ~idchar
@@ -82,8 +79,6 @@ Banana {
   array = "Bunch" ~idchar
   func = "pick" ~idchar
   let = "let" ~idchar
-  model = "model" ~idchar
-  config = "config" ~idchar
   self = "self" ~idchar
   enum = "enum" ~idchar
   while = "while" ~idchar
@@ -106,11 +101,11 @@ Banana {
   in = "in" ~idchar
   ctor = "constructor" ~idchar
 
-  
-  keyword = string | int | print | boolean | array | func | let | model | config | self
+
+  keyword = string | int | print | boolean | array | func | let | self
           | enum | while | if | else | switch | case | default | return | for | void
           | null | true | false | in | ctor 
-         
+
   id = ~keyword letter idchar*
   idchar = alnum | "-" 
   num = digit+ ("." digit+)? (("e" | "E") ("+" | "-")? digit+)?
@@ -119,6 +114,6 @@ Banana {
   char = "\\u{" hexDigit+ "}"   --codepoint
        | "\\" any               --nonbackslash
        | ~"\'" any
-       
+
   space += "//" (~"\n" any)*  --comment
 }
