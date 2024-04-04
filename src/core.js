@@ -24,7 +24,7 @@ export function params(param) {
   return { kind: "Params", param };
 }
 
-export function params(type, id, exp) {
+export function param(type, id, exp) {
   return { kind: "Param", type, id, exp };
 }
 

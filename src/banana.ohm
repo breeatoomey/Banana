@@ -12,12 +12,12 @@ Banana {
        | PrintStmt
 
   VarDecl = let Type id "=" Exp
-  FunDecl = func id "(" Params ")" "->" Type ":" Body
+  FunDecl = func id "(" Params ")" "->" Type Body
   
 
   Params = ListOf<Param, ",">
   Param = Type id ("=" Exp)?
-  Body = Stmt+
+  Body = ":" Stmt+ "|"
 
   Type = array "(" Type ")"   -- array
        | boolean              -- boolean
@@ -26,19 +26,18 @@ Banana {
        | string               -- string
        | id                   -- modeltype
 
-  Assignment = id "=" Exp               -- reassignment
+  Assignment = id "=" Exp      -- reassignment
 
   ReturnStmt = return Exp 
   CallStmt = Call                -- funcall
   PrintStmt = print "(" Exp? ")"
 
-  ForStmt = for id in Exp ":" Body
-  WhileStmt = while Exp ":" Body
-  IfStmt = if Exp ":" Body elif Exp ":" Body else ":" Body  -- elif_with_else
-         | if Exp ":" Body elif Exp ":" Body                -- elif
-        | if Exp ":" Body else ":" Body                    -- with_else
-         | if Exp ":" Body else ":" IfStmt                  -- nested_if
-         | if Exp ":" Body                                  -- plain_if
+  ForStmt = for id in Exp Body
+  WhileStmt = while Exp Body
+
+  IfStmt = if Exp Body else Body                  --long
+         | if Exp Body else IfStmt                --elsif
+         | if Exp Body                            --short
 
 
   Call = id "(" Args ")"
