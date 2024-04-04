@@ -66,6 +66,7 @@ Banana {
             | CallStmt                                     -- call
             | id "!"?                                      -- id
             | stringlit                                    -- string
+            | void                                    -- void
 
 
 
