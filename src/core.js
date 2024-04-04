@@ -2,8 +2,12 @@ export function program(statements) {
   return { kind: "Program", statements };
 }
 
-export function variableDeclaration(type, id, exp) {
-  return { kind: "VariableDeclaration", type, id, exp };
+export function variableDeclaration(variable, initializer) {
+  return { kind: "VariableDeclaration", variable, initializer};
+}
+
+export function variable(name, type) {
+  return { kind: "Variable", name, type }
 }
 
 export const arrayType = { kind: "ArrayType" };
@@ -70,4 +74,16 @@ export function args(exp) {
 
 export function assignment(id, exp) {
   return { kind: "Assignement", id, exp };
+}
+
+export function unary(op, operand, type) {
+  return { kind: "UnaryExpression", op, operand, type }
+}
+
+export function binary(op, left, right, type) {
+  return { kind: "BinaryExpression", op, left, right, type }
+}
+
+export function conditional(test, consequent, alternate, type) {
+  return { kind: "Conditional", test, consequent, alternate, type }
 }
