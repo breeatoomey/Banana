@@ -27,8 +27,8 @@ export function func(id, type) {
   return { kind: "Function", id, type };
 }
 
-export function functionType(paramTypes, returnType) {
-  return { kind: "FunctionType", paramTypes, returnType }
+export function functionType(paramTypes, returnType, paramCount) {
+  return { kind: "FunctionType", paramTypes, returnType, paramCount }
 }
 
 export function params(param) {
@@ -92,6 +92,10 @@ export function binary(op, left, right, type) {
 
 export function conditional(test, consequent, alternate, type) {
   return { kind: "Conditional", test, consequent, alternate, type }
+}
+
+export function arrayExpression(elements) {
+  return { kind: "ArrayExpression", elements, type: arrayType(elements[0].type) }
 }
 
 String.prototype.type = stringType

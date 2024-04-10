@@ -138,6 +138,10 @@ export default function analyze(match) {
     must(entity?.kind === "Variable", `Functions can not appear here`, at)
   }
 
+  function mustBeAFunction(entity, at) {
+    must(entity?.kind === "Function", `${entity.name} is not a function`, at)
+  }
+
   function equivalent(t1, t2) {
     return (
       t1 === t2 ||
@@ -269,7 +273,8 @@ export default function analyze(match) {
       // but we do need to set it before analyzing the body.
       const paramTypes = params.map(param => param.type)
       const returnType = type.children?.[0]?.rep() ?? VOID
-      func.type = core.functionType(paramTypes, returnType)
+      const paramCount = params.length
+      func.type = core.functionType(paramTypes, returnType, paramCount)
 
       // Analyze body while still in child context
       const body = block.rep()
@@ -314,7 +319,7 @@ export default function analyze(match) {
 
     ReturnStmt(return_keyword, exp) {
       mustBeInAFunction({ at: return_keyword })
-      mustReturnSomething(context.function, { at: return_keyword })
+      // mustReturnSomething(context.function, { at: return_keyword })
       const return_expression = exp.rep()
       mustBeReturnable(return_expression, { from: context.function }, { at: exp })
       return core.returnStatement(return_expression)
@@ -378,6 +383,12 @@ export default function analyze(match) {
       return exp.rep()
     },
 
+    Primitive_arrayexp(_open, args, _close) {
+      const elements = args.asIteration().children.map(e => e.rep())
+      mustAllHaveSameType(elements, { at: args })
+      return core.arrayExpression(elements)
+    },
+
     Primitive_id(id, _postfix) {
       // ids used in expressions must have been already declared and must
       // be bound to variable entities, not function entities.
@@ -387,11 +398,26 @@ export default function analyze(match) {
       return entity
     },
 
-    true(_) {
+    Primitive_call(id, _open, expList, _close) {
+      // ids used in calls must have already been declared and must be
+      // bound to function entities, not to variable entities.
+      const callee = context.lookup(id.sourceString)
+      mustHaveBeenFound(callee, id.sourceString, { at: id })
+      mustBeAFunction(callee, { at: id })
+      const args = expList.asIteration().children.map(arg => arg.rep())
+      mustHaveCorrectArgumentCount(args.length, callee.type.paramCount, { at: id })
+      return core.call(callee, args)
+    },
+
+    Primitive_void(_) {
+      return core.voidType
+    },
+
+    Primitive_true(_) {
       return true
     },
 
-    false(_) {
+    Primitive_false(_) {
       return false
     },
 

@@ -4,7 +4,7 @@ Banana {
   Stmt = VarDecl
        | FunDecl
        | Assignment 
-       | CallStmt 
+       | Primitive_call
        | IfStmt 
        | WhileStmt 
        | ForStmt
@@ -28,8 +28,7 @@ Banana {
 
   Assignment = Primitive "=" Exp      
 
-  ReturnStmt = return Exp 
-  CallStmt = Call                -- funcall
+  ReturnStmt = return Exp         
   PrintStmt = print "(" Exp? ")"
 
   ForStmt = for id in Exp Body
@@ -39,8 +38,6 @@ Banana {
          | if Exp Body else IfStmt                --elsif
          | if Exp Body                            --short
 
-
-  Call = id "(" Args ")"
   Args = ListOf<Exp, ",">
 
   Exp       = ("-" | "!") Primitive                         -- unary 									
@@ -63,7 +60,7 @@ Banana {
             | num                                          -- num
             | true               					    -- true
             | false								    -- false
-            | CallStmt                                     -- call
+            | id "(" ListOf<Exp, ","> ")"                  -- call
             | id "!"?                                      -- id
             | stringlit                                    -- string
             | void                                    -- void

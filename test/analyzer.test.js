@@ -13,12 +13,12 @@ const semanticChecks = [
     "assign arrays",
     "let Bunch(Int) a = (1) let Bunch(Int) b = (2) a = b b = a",
   ],
-  ["void return", "pick f() -> Nothing: serve Nothing"],
-  ["boolean return", "pick f() -> Boo: serve ripe"],
+  ["void return", "pick f() -> Nothing: serve Nothing |"],
+  ["boolean return", "pick f() -> Boo: serve ripe |"],
   [
     "call of assigned function in expression",
     `pick f(Int x) -> Int: serve x+1|
-    let g = f
+    let Int g = f
     plant(g(1))
     f = g // Type check here`,
   ],
@@ -30,7 +30,10 @@ const semanticChecks = [
   ["ternary", "let Boo result = (3 > 0)? -> 'Positive' ->> 'Negative'"],
   [
     "call of assigned functions",
-    "pick f(Int x) -> Int: x+2 | let Int g=f g(1)",
+    "pick f(Int x) -> Int: serve x+2 | let Int y = f(1)",
+  ],
+  ["call of assigned function out of var declaration",
+   "pick f(Boo banana) -> Boo: serve banana | f(rotten)",
   ],
   [
     "assigned functions",
