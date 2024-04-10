@@ -26,7 +26,7 @@ Banana {
        | string               -- string
        | id                   -- modeltype
 
-  Assignment = id "=" Exp      -- reassignment
+  Assignment = Primitive "=" Exp      
 
   ReturnStmt = return Exp 
   CallStmt = Call                -- funcall

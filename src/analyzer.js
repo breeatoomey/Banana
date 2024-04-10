@@ -291,12 +291,20 @@ export default function analyze(match) {
       return param
     },
 
-    VarDecl(modifer, type, id, _eq, exp) {
+    VarDecl(_modifer, _type, id, _eq, exp) {
       const initializer = exp.rep()
       const variable = core.variable(id.sourceString, initializer.type)
       mustNotAlreadyBeDeclared(id.sourceString, { at: id })
       context.add(id.sourceString, variable)
       return core.variableDeclaration(variable, initializer)
+    },
+
+    Assignment(variable, _eq, expression) {
+      const source = expression.rep()
+      const target = variable.rep()
+      mustBeAssignable(source, { toType: target.type }, { at: variable })
+      mustNotBeReadOnly(target, { at: variable })
+      return core.assignment(target, source)
     },
 
     Body(_open, statements, _close) {
@@ -352,8 +360,10 @@ export default function analyze(match) {
       return core.binary(op.sourceString, exp1.rep(), exp2.rep())
     },
 
-    Exp4_binary(exp1, op, exp2) {
-      return core.binary(op.sourceString, exp1.rep(), exp2.rep())
+    Exp4_binary(exp1, addOp, exp2) {
+      const [left, op, right] = [exp1.rep(), addOp.sourceString, exp2.rep()]
+      mustBothHaveTheSameType(left, right, { at: addOp })
+      return core.binary(op, left, right, left.type)
     },
 
     Exp5_binary(exp1, op, exp2) {

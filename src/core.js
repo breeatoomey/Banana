@@ -40,7 +40,6 @@ export function param(type, id, exp) {
 }
 
 export const standardLibrary = Object.freeze({
-  array: arrayType,
   bool: boolType,
   void: voidType,
   int: intType,
@@ -94,3 +93,7 @@ export function binary(op, left, right, type) {
 export function conditional(test, consequent, alternate, type) {
   return { kind: "Conditional", test, consequent, alternate, type }
 }
+
+String.prototype.type = stringType
+Number.prototype.type = intType
+Boolean.prototype.type = boolType

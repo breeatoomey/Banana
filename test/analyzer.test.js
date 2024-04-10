@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import parse from "../src/parser.js"
 import analyze from "../src/analyzer.js"
-import { program, variableDeclaration} from "../src/core.js"
+import { program, variableDeclaration } from "../src/core.js"
 
 // Programs that are semantically correct
 const semanticChecks = [
