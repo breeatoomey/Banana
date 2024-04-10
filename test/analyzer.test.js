@@ -6,7 +6,7 @@ import { program, variableDeclaration} from "../src/core.js"
 // Programs that are semantically correct
 const semanticChecks = [
   ["variable declarations", "let Int x = 1 let Boo y = rotten"],
-  ["complex array types", "pick f(Bunch(Bunch(Int)) x) -> String: serve x"],
+  ["complex array types", "pick f(Bunch(Bunch(Int)) x) -> Bunch(Bunch(Int)): serve x |"],
   ["increment and decrement", "let Int x = 10 x = x - 1 x = x + 1"],
   ["initialize array with correct types", "let Bunch(int) a = (1,2,3)"],
   [

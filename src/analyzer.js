@@ -134,6 +134,10 @@ export default function analyze(match) {
     must(t?.kind === "ArrayType", "Must be an array type", at)
   }
 
+  function mustBeAVariable(entity, at) {
+    must(entity?.kind === "Variable", `Functions can not appear here`, at)
+  }
+
   function equivalent(t1, t2) {
     return (
       t1 === t2 ||
@@ -153,7 +157,6 @@ export default function analyze(match) {
 
   function assignable(fromType, toType) {
     return (
-      toType == ANY ||
       equivalent(fromType, toType) ||
       (fromType?.kind === "FunctionType" &&
         toType?.kind === "FunctionType" &&
@@ -186,9 +189,9 @@ export default function analyze(match) {
         const returnType = typeDescription(type.returnType)
         return `(${paramTypes})->${returnType}`
       case "ArrayType":
-        return `[${typeDescription(type.baseType)}]`
+        return `[${typeDescription(type.base_type)}]`
       case "OptionalType":
-        return `${typeDescription(type.baseType)}?`
+        return `${typeDescription(type.base_type)}?`
     }
   }
 
@@ -250,12 +253,83 @@ export default function analyze(match) {
       return core.program(statements.children.map(s => s.rep()))
     },
 
+    FunDecl(_func, id, _left_paren, parameters, _right_paren, _arrow, type, block) {
+      // Start by making the function, but we don't yet know its type.
+      // Also add it to the context so that we can have recursion.
+      const func = core.func(id.sourceString)
+      mustNotAlreadyBeDeclared(id.sourceString, { at: id })
+      context.add(id.sourceString, func)
+
+      // Parameters are part of the child context
+      context = context.newChildContext({ inLoop: false, function: func })
+      const params = parameters.rep()
+
+      // Now that the parameters are known, we compute the function's type.
+      // This is fine; we did not need the type to analyze the parameters,
+      // but we do need to set it before analyzing the body.
+      const paramTypes = params.map(param => param.type)
+      const returnType = type.children?.[0]?.rep() ?? VOID
+      func.type = core.functionType(paramTypes, returnType)
+
+      // Analyze body while still in child context
+      const body = block.rep()
+
+      // Go back up to the outer context before returning
+      context = context.parent
+      return core.functionDeclaration(func, params, body)
+    },
+
+    Params(param_list) {
+      // Returns a list of variable nodes
+      return param_list.asIteration().children.map(p => p.rep())
+    },
+
+    Param(type, id, _eq, _exp) {
+      const param = core.variable(id.sourceString, type.rep())
+      mustNotAlreadyBeDeclared(param.name, { at: id })
+      context.add(param.name, param)
+      return param
+    },
+
     VarDecl(modifer, type, id, _eq, exp) {
       const initializer = exp.rep()
       const variable = core.variable(id.sourceString, initializer.type)
       mustNotAlreadyBeDeclared(id.sourceString, { at: id })
       context.add(id.sourceString, variable)
       return core.variableDeclaration(variable, initializer)
+    },
+
+    Body(_open, statements, _close) {
+      // No need for a block node, just return the list of statements
+      return statements.children.map(s => s.rep())
+    },
+
+    ReturnStmt(return_keyword, exp) {
+      mustBeInAFunction({ at: return_keyword })
+      mustReturnSomething(context.function, { at: return_keyword })
+      const return_expression = exp.rep()
+      mustBeReturnable(return_expression, { from: context.function }, { at: exp })
+      return core.returnStatement(return_expression)
+    },
+
+    Type_array(_arr, _left, base_type, _right) {
+      return core.arrayType(base_type.rep())
+    },
+
+    Type_boolean(_boo_keyword) {
+      return core.boolType
+    },
+
+    Type_void(_void_keyword) {
+      return core.voidType
+    },
+
+    Type_int(_int_keyword) {
+      return core.intType
+    },
+
+    Type_string(_str_keyword) {
+      return core.stringType
     },
 
     Exp_unary(op, exp) {
@@ -311,15 +385,16 @@ export default function analyze(match) {
       return false
     },
 
+    num(_whole, _point, _fraction, _e, _sign, _exponent) {
+      return Number(this.sourceString)
+    },
+
     stringlit(_openQuote, _chars, _closeQuote) {
       // Carlos strings will be represented as plain JS strings, including
       // the quotation marks
       return this.sourceString
     },
 
-    num(_whole, _point, _fraction, _e, _sign, _exponent) {
-      return Number(this.sourceString)
-    },
   })
 
   return builder(match).rep()

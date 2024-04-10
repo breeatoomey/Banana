@@ -10,18 +10,25 @@ export function variable(name, type) {
   return { kind: "Variable", name, type }
 }
 
-export const arrayType = { kind: "ArrayType" };
 export const boolType = { kind: "BoolType" };
 export const voidType = { kind: "VoidType" };
 export const intType = { kind: "IntType" };
 export const stringType = { kind: "StringType" };
+
+export function arrayType(base_type) {
+  return { kind: "ArrayType", base_type }
+}
 
 export function functionDeclaration(func, params, body) {
   return { kind: "FunDecl", func, params, body };
 }
 
 export function func(id, type) {
-  return { kind: "Func", id, type };
+  return { kind: "Function", id, type };
+}
+
+export function functionType(paramTypes, returnType) {
+  return { kind: "FunctionType", paramTypes, returnType }
 }
 
 export function params(param) {
@@ -56,7 +63,7 @@ export function printStatement(id, exp) {
   return { kind: "PrintStatement", id, exp };
 }
 
-export function returnStatment(id, exp) {
+export function returnStatement(id, exp) {
   return { kind: "ReturnStatement", id, exp };
 }
 
