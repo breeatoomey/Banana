@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Code</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Inter;
+            margin: 0;
+            padding: 0;
+            background-image: url('public/360_f_385726776_2kgzdmzfhanqlx9opkbqusb9p0gqpclh-1500w.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .container {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .hero-section {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #000;
+        }
+        .logo-container {
+            position: absolute; 
+            left: 20px;
+        }
+        .title-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+        }
+        .hero-section img {
+            max-width: 80px;
+        }
+        .section {
+            margin-bottom: 40px;
+            margin-top: 40px;
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+            background-color: #009dff;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #3c3c3c;
+            color: #fff;
+            padding: 8px 12px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        .copy-btn {
+            cursor: pointer;
+            background-color: #35b2ff; 
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .container .example {
+            border: 1px solid #dddddd; 
+            background-color: #f9f9f9; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .container pre {
+            background-color: #585858;
+            color: #fff;
+            padding: 15px; 
+            overflow-x: auto; 
+            margin-top: 0; 
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px; 
+        }
+        .container code {
+            font-family: 'Courier New', Courier, monospace; 
+            white-space: pre-wrap; 
+        }
+        .developer-bio img {
+            max-width: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .developer-bio img {
+            max-width: 120px; 
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .developer-bio h5, .developer-bio p {
+            font-size: 0.8rem; 
+        }
+        .developer-bio {
+            flex: 1;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        footer {
+            background-color: #35b2ff;
+            color: #ffffff;
+            padding: 10px 0;
+            border-top: 1px solid #000; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero-section">
+    <div class="logo-container">
+        <img src="public/bananalogo-400h.png" alt="Banana Code Logo">
+    </div>
+    <div class="title-container">
+        <h1> <b> Welcome to Banana Code </b></h1>
+        <p>Revolutionizing the way we code</p>
+    </div>
+</div>
+
+<div class="container section">
+    <h2>Our Story</h2>
+    <p>What if there was a programming language that mirrored the simplicity and versatility of a banana? This exact question is how the vision for "Banana" was born. Driven by a desire to make coding more accessible, efficient, and enjoyable, the Banana team has embarked on a journey to develop a novel (and slightly esoteric) language that truly peels away the complexities, making programming as delightful as peeling a ripe banana. The Banana coding language is a symbol of ingenuity and a testament to the extraordinary places inspiration can spring from in the world of technology. This project aims to create an innovative programming language that provokes creativity, facilitates learning, and streamlines the coding experience for developers of all levels who are looking to seamlessly navigate and execute their goals.
+
+    </p>
+</div>
+
+<div class="container section">
+    <h2>Example Programs</h2>
+
+    <div class="example">
+        <h4>Hello World</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>plant('hello world')</code></pre>
+    </div>
+
+    <div class="example">
+        <h4>Fibonacci</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>pick fibonacci(Int n) -> Int:
+    if (n <= 1):
+        serve n
+    else:
+        serve fibonacci(n-1) + fibonacci(n-2)</code></pre>
+    </div>
+
+    <div class="example">
+        <h4>Num Is Even</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>pick is_even(Int n) -> Boo:
+    serve n % 2 == 0</code></pre>
+    </div>
+
+    <div class="example">
+        <h4>String to Array</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>let String sentence = 'This is a sentence.'
+let Bunch words = sentence.peel(' ')
+
+plant(words) // output: 0x00007F543210ABCD
+plant(words!) // output: ['This', 'is', 'a', 'sentence.']</code></pre>
+    </div>
+
+    <div class="example">
+        <h4>Person Class</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>model Person:
+    config(String name, Int age):
+        self.name = name 
+        self.age = age
+
+    pick greet() -> Nothing:
+        plant('Hello, my name is \<self.name>!')
+
+let Person person1 = Person('Alice', 30)
+person1.greet() // Output: Hello, my name is Alice!</code></pre>
+    </div>
+
+    <div class="example">
+        <h4>Positive or Negative with Ternary</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>pick check-sign(Int num) -> String:
+    let Boo result = (num > 0)? -> 'Positive' ->> 'Negative'
+    serve result</code></pre>
+    </div>
+
+    <div class="example">
+        <h4>Example 7: Elif Statement</h4>
+        <div class="code-header">
+            <span>Banana</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>if num > 0:
+    plant('Number is positive')
+elif num < 0:
+    plant('Number is negative')
+else:
+    plant('Number is zero')</code></pre>
+    </div>
+
+</div>
+
+<script>
+function copyCode(button) {
+    var code = button.parentElement.nextElementSibling.innerText;
+    var textarea = document.createElement("textarea");
+    textarea.value = code;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+}
+</script>
+
+
+
+<div class="container section">
+    <h2>Meet the Minions</h2>
+    <div class="row d-flex justify-content-around">
+        <div class="col-md-3 text-center developer-bio">
+            <img src="https://via.placeholder.com/150" alt="Developer Name">
+            <h5> Breea Toomey</h5>
+            <p>Banana enthusiast, Gru's number one fan!</p>
+        </div>
+        
+        <div class="col-md-3 text-center developer-bio">
+            <img src="https://via.placeholder.com/150" alt="Developer Name">
+            <h5>Caroline Ellis</h5>
+            <p>Accidentally blew up the lab, again!</p>
+        </div>
+
+        <div class="col-md-3 text-center developer-bio">
+            <img src="https://via.placeholder.com/150" alt="Developer Name">
+            <h5>Denali Tonn</h5>
+            <p>Aspiring moon thief, part-time dance star.</p>
+        </div>
+
+        <div class="col-md-3 text-center developer-bio">
+            <img src="https://via.placeholder.com/150" alt="Developer Name">
+            <h5>Dylan Krim</h5>
+            <p>Sings opera in the shower, poorly.</p>
+        </div>
+
+        <div class="col-md-3 text-center developer-bio">
+            <img src="https://via.placeholder.com/150" alt="Developer Name">
+            <h5>Maddie Mcdowell</h5>
+            <p>Freeze ray fanatic, occasional ice sculptor.</p>
+        </div>
+
+    </div>
+</div>
+
+<footer class="container-fluid text-center">
+    <p>Check out our <a href="https://github.com/breeatoomey/Banana" target="_blank" style="color: #ffffff;">GitHub Repository</a></p>
+</footer>
+
+</body>
+</html>
