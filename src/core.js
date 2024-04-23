@@ -3,20 +3,15 @@ export function program(statements) {
 }
 
 export function variableDeclaration(variable, initializer) {
-  return { kind: "VariableDeclaration", variable, initializer};
+  return { kind: "VariableDeclaration", variable, initializer };
 }
 
 export function variable(name, type) {
-  return { kind: "Variable", name, type }
+  return { kind: "Variable", name, type };
 }
 
-export const boolType = { kind: "BoolType" };
-export const voidType = { kind: "VoidType" };
-export const intType = { kind: "IntType" };
-export const stringType = { kind: "StringType" };
-
 export function arrayType(base_type) {
-  return { kind: "ArrayType", base_type }
+  return { kind: "ArrayType", base_type };
 }
 
 export function functionDeclaration(func, params, body) {
@@ -28,7 +23,7 @@ export function func(id, type) {
 }
 
 export function functionType(paramTypes, returnType, paramCount) {
-  return { kind: "FunctionType", paramTypes, returnType, paramCount }
+  return { kind: "FunctionType", paramTypes, returnType, paramCount };
 }
 
 export function params(param) {
@@ -39,27 +34,16 @@ export function param(type, id, exp) {
   return { kind: "Param", type, id, exp };
 }
 
-export const standardLibrary = Object.freeze({
-  bool: boolType,
-  void: voidType,
-  int: intType,
-  string: stringType,
-});
-
-export function ifStatement(exp, body) {
-  return { kind: "IfStatement", exp, body };
+export function longIfStatement(test, consequent, alternate) {
+  return { kind: "LongIfStatement", test, consequent, alternate }
 }
 
-export function whileStatement(id, exp, body) {
-  return { kind: "WhileStatement", id, exp, body };
+export function whileStatement(test, body) {
+  return { kind: "WhileStatement", test, body };
 }
 
 export function forStatement(id, exp, body) {
   return { kind: "ForStatement", id, exp, body };
-}
-
-export function printStatement(id, exp) {
-  return { kind: "PrintStatement", id, exp };
 }
 
 export function returnStatement(id, exp) {
@@ -70,8 +54,8 @@ export function callStatement(call) {
   return { kind: "CallStatement", call };
 }
 
-export function call(id, args) {
-  return { kind: "Call", id, args };
+export function functionCall(callee, args) {
+  return { kind: "FunctionCall", callee, args, type: callee.type.returnType };
 }
 
 export function args(exp) {
@@ -83,21 +67,41 @@ export function assignment(id, exp) {
 }
 
 export function unary(op, operand, type) {
-  return { kind: "UnaryExpression", op, operand, type }
+  return { kind: "UnaryExpression", op, operand, type };
 }
 
 export function binary(op, left, right, type) {
-  return { kind: "BinaryExpression", op, left, right, type }
+  return { kind: "BinaryExpression", op, left, right, type };
 }
 
 export function conditional(test, consequent, alternate, type) {
-  return { kind: "Conditional", test, consequent, alternate, type }
+  return { kind: "Conditional", test, consequent, alternate, type };
 }
 
 export function arrayExpression(elements) {
-  return { kind: "ArrayExpression", elements, type: arrayType(elements[0].type) }
+  return {
+    kind: "ArrayExpression",
+    elements,
+    type: arrayType(elements[0].type),
+  };
 }
 
-String.prototype.type = stringType
-Number.prototype.type = intType
-Boolean.prototype.type = boolType
+export const boolType = { kind: "BoolType" };
+export const voidType = { kind: "VoidType" };
+export const intType = { kind: "IntType" };
+export const stringType = { kind: "StringType" };
+export const anyType = { kind: "AnyType" }
+
+String.prototype.type = stringType;
+Number.prototype.type = intType;
+Boolean.prototype.type = boolType;
+voidType.type = voidType;
+
+export const standardLibrary = Object.freeze({
+  bool: boolType,
+  void: voidType,
+  int: intType,
+  string: stringType,
+  any: anyType,
+  Plant: func("Plant", functionType([anyType], voidType, 1)),
+});

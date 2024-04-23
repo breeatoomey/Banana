@@ -4,12 +4,11 @@ Banana {
   Stmt = VarDecl
        | FunDecl
        | Assignment 
-       | Primitive_call
+       | Primitive_call        -- call
        | IfStmt 
        | WhileStmt 
        | ForStmt
        | ReturnStmt
-       | PrintStmt
 
   VarDecl = let Type id "=" Exp
   FunDecl = func id "(" Params ")" "->" Type Body
@@ -29,14 +28,12 @@ Banana {
   Assignment = Primitive "=" Exp      
 
   ReturnStmt = return Exp         
-  PrintStmt = print "(" Exp? ")"
-
-  ForStmt = for id in Exp Body
+  ForStmt = for id in Exp Body     -- collection
   WhileStmt = while Exp Body
 
-  IfStmt = if Exp Body else Body                  --long
-         | if Exp Body else IfStmt                --elsif
-         | if Exp Body                            --short
+  IfStmt = if Exp Body else Body                  -- long
+         | if Exp Body else IfStmt                -- elsif
+         | if Exp Body                            -- short
 
   Args = ListOf<Exp, ",">
 
@@ -55,8 +52,8 @@ Banana {
             | Exp6
   Exp6      = Primitive "**" Exp6                                -- binary
             | Primitive
-  Primitive = "(" NonemptyListOf<Exp, ","> ")"             -- arrayexp
-            |"(" Exp ")"                                   -- parens
+  Primitive = "(" Exp ")"                                   -- parens
+            |"(" NonemptyListOf<Exp, ","> ")"             -- arrayexp
             | num                                          -- num
             | true               					    -- true
             | false								    -- false
@@ -71,7 +68,6 @@ Banana {
 
   string = "String" ~idchar 
   int = "Int" ~idchar
-  print = "Plant" ~idchar
   boolean = "Boo" ~idchar
   array = "Bunch" ~idchar
   func = "pick" ~idchar
@@ -93,13 +89,13 @@ Banana {
   for = "for" ~idchar
   void = "Nothing" ~idchar
   null = "null" ~idchar
-  true = "ripe" ~idchar
-  false = "rotten" ~idchar
+  true = "ripe" ~alnum
+  false = "rotten" ~alnum
   in = "in" ~idchar
   ctor = "constructor" ~idchar
 
 
-  keyword = string | int | print | boolean | array | func | let | self
+  keyword = string | int | boolean | array | func | let | self
           | enum | while | if | else | switch | case | default | return | for | void
           | null | true | false | in | ctor 
 

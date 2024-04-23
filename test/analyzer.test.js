@@ -1,7 +1,7 @@
-import assert from "node:assert/strict"
-import parse from "../src/parser.js"
-import analyze from "../src/analyzer.js"
-import { program, variableDeclaration } from "../src/core.js"
+import assert from "node:assert/strict";
+import parse from "../src/parser.js";
+import analyze from "../src/analyzer.js";
+import { program, variableDeclaration, variable, binary, intType } from "../src/core.js";
 
 // Programs that are semantically correct
 const semanticChecks = [
@@ -9,42 +9,43 @@ const semanticChecks = [
   ["complex array types", "pick f(Bunch(Bunch(Int)) x) -> Bunch(Bunch(Int)): serve x |"],
   ["increment and decrement", "let Int x = 10 x = x - 1 x = x + 1"],
   ["initialize array with correct types", "let Bunch(int) a = (1,2,3)"],
-  [
-    "assign arrays",
-    "let Bunch(Int) a = (1) let Bunch(Int) b = (2) a = b b = a",
-  ],
+  ["assign arrays", "let Bunch(Int) a = (1) let Bunch(Int) b = (2) a = b b = a"],
   ["void return", "pick f() -> Nothing: serve Nothing |"],
   ["boolean return", "pick f() -> Boo: serve ripe |"],
   [
-    "call of assigned function in expression",
-    `pick f(Int x) -> Int: serve x+1|
-    let Int g = f
-    plant(g(1))
-    f = g // Type check here`,
+    "call of assigned function within print statement",
+    `pick f(Int x) -> Int: serve x + 1|
+    Plant(f(1))`,
   ],
-  [
-    "function assign",
-    "pick f() -> Nothing: serve Nothing| let g = f let Bunch(Nothing) h = (g, f) plant(h)",
-  ],
-  ["array parameters", "pick f(Int x, Boo y) -> Int: serve x-1|"],
+  ["void function assign and call", "pick f() -> Nothing: serve Nothing| f()"],
+  ["array parameters", "pick f(Int x, Boo y) -> Int: serve x - 1|"],
   ["ternary", "let Boo result = (3 > 0)? -> 'Positive' ->> 'Negative'"],
-  [
-    "call of assigned functions",
-    "pick f(Int x) -> Int: serve x+2 | let Int y = f(1)",
-  ],
-  ["call of assigned function out of var declaration",
-   "pick f(Boo banana) -> Boo: serve banana | f(rotten)",
-  ],
-  [
-    "assigned functions",
-    "pick f() -> Nothing: serve Nothing | let Nothing g = f g = f",
-  ],
-  ["||", "plant(true||1<2||false||!true)"],
-  ["&&", "plant(true&&1<2&&false&&!true)"],
-  ["void in fn type", "pick f(Nothing g) -> Nothing: serve g |"],
-  ["for loop", "for i in 10 : plant(0)|"],
+  ["call of assigned functions", "pick f(Int x) -> Int: serve x+2 | let Int y = f(1)"],
+  ["call of assigned function out of var declaration", "pick f(Boo banana) -> Boo: serve banana | f(rotten)"],
+  ["assigned functions", "pick f() -> Nothing: serve Nothing | let Nothing g = f g = f"],
+  ["||", "Plant(ripe||1<2||rotten||ripe)"],
+  ["&&", "Plant(ripe&&1<7&&rotten&&ripe)"],
+  ["void parameter in void function", "pick f(Nothing g) -> Nothing: serve g |"],
+  ["for loop", "let Bunch(Int) bananas = (0, 7, 14) for i in bananas: Plant(i)|"],
+  ["while loop", "let Int x = 0 while x < 3: x = x + 1|"],
+  ["nested loops", "for i in (1,2,3): for j in (4,5,6): Plant(i+j)||"],
 
-  //   ["assign to array element", "let Bunch(Int) a = (1,2,3) a(1)=100"],
+  ["nested if", "if true {if false {Plant(1)} else {Plant(2)}} else {Plant(3)}"],
+  
+  ["nested if with return", "if true {if false {serve 1} else {serve 2}} else {serve 3}"],
+  ["nested if with break", "while true {if true {break} else {Plant(1)}}"],
+  ["nested if with repeat", "repeat 3 {if true {Plant(1)} else {Plant(2)}}"],
+  ["nested if with for", "for i in [1,2,3] {if true {Plant(1)} else {Plant(2)}}"],
+  ["nested if with while", "let Int x = 0 while x < 3 {if true {Plant(1)} else {Plant(2)} x = x + 1}"],
+  ["nested if with nested for", "for i in [1,2,3] {if true {for j in [4,5,6] {Plant(i+j)}} else {Plant(2)}}"],
+  ["nested if with nested while", "let Int x = 0 while x < 3 {if true {while true {Plant(1)} x = x + 1} else {Plant(2)}}"],
+  ["nested if with nested repeat", "repeat 3 {if true {repeat 3 {Plant(1)}} else {Plant(2)}}"],
+  ["nested if with nested if", "if true {if true {Plant(1)} else {Plant(2)}} else {Plant(3)}"],
+  ["nested if with nested return", "if true {if true {serve 1} else {serve 2}} else {serve 3}"],
+  ["nested if with nested break", "while true {if true {break} else {Plant(1)}}"],
+  ["nested if with nested for", "for i in [1,2,3] {if true {Plant(1)} else {Plant(2)}}"],
+
+  // ["assign to array element", "let Bunch(Int) a = (1,2,3) a(1)=100"],
   //   ["assign optionals", "let a = no int;let b=some 1;a=b;b=a;"],
   //   ["return in nested if", "function f() {if true {return;}}"],
   //   ["break in nested if", "while false {if true {break;}}"],
@@ -96,56 +97,28 @@ const semanticChecks = [
 
 // Programs that are syntactically correct but have semantic errors
 const semanticErrors = [
-  ["non-int increment", "let Boo x = rotten x = x + 1", /an integer/],
-  [
-    "redeclared id",
-    "let Int x = 1 let Int x = 1",
-    /Identifier x already declared/,
-  ],
-  ["undeclared id", "pick f() -> Int: serve x", /Identifier x not declared/],
-  [
-    "assign bad type",
-    "let Int x = 1 x = rotten",
-    /Cannot assign a boolean to a int/,
-  ],
-  [
-    "return outside function",
-    "serve Nothing",
-    /Return can only appear in a function/,
-  ],
-  [
-    "return nothing from non-void",
-    "pick f() -> Int: serve Nothing",
-    /Int should be returned/,
-  ],
-  [
-    "Parameter type mismatch",
-    "pick f(Int x) -> Int: serve (x + 1) \n f(rotten)",
-    /Cannot assign a boolean to a int/,
-  ],
-  ["bad types for ||", "plant(false||1);", /Expected a boolean/],
-  ["bad types for &&", "plant(false&&1);", /Expected a boolean/],
-  [
-    "bad types for ==",
-    "plant(false==1);",
-    /Operands do not have the same type/,
-  ],
-  [
-    "bad types for !=",
-    "plant(false==1);",
-    /Operands do not have the same type/,
-  ],
-  ["bad types for +", "plant(false+1);", /Expected a number or string/],
-  ["bad types for -", "plant(false-1);", /Expected a number/],
-  ["bad types for *", "plant(false*1);", /Expected a number/],
-  ["bad types for /", "plant(false/1);", /Expected a number/],
-  ["bad types for **", "plant(false**1);", /Expected a number/],
-  ["bad types for <", "plant(false<1);", /Expected a number or string/],
-  ["bad types for <=", "plant(false<=1);", /Expected a number or string/],
-  ["bad types for >", "plant(false>1);", /Expected a number or string/],
-  ["bad types for >=", "plant(false>=1);", /Expected a number or string/],
-  ["return type mismatch", "pick f() -> Int: serve false|", /boolean to a int/],
-  ["diff type array elements", "plant((3,3.0));", /Not all elements have the same type/],
+  ["non-int increment", "let Boo x = rotten x = x + 1", /Expected a number or string/],
+  ["redeclared id", "let Int x = 1 let Int x = 1", /Identifier x already declared/],
+  ["undeclared id", "pick f() -> Int: serve x|", /Identifier x not declared/],
+  ["assign bad type", "let Int x = 1 x = rotten", /Cannot assign a boolean to a int/],
+  ["return outside function", "serve Nothing", /Return can only appear in a function/],
+  ["return nothing from non-void", "pick f() -> Int: serve Nothing|", /Cannot assign a void to a int/],
+  ["Parameter type mismatch", "pick f(Int x) -> Int: serve x + 1| f(rotten)", /Cannot assign a boolean to a int/],
+  ["bad types for ||", "Plant(rotten||1)", /Expected a boolean/],
+  ["bad types for &&", "Plant(rotten&&1)", /Expected a boolean/],
+  ["bad types for ==", "Plant(rotten==1)", /Operands do not have the same type/],
+  ["bad types for !=", "Plant(rotten==1)", /Operands do not have the same type/],
+  ["bad types for +", "Plant(rotten+1)", /Expected a number or string/],
+  ["bad types for -", "Plant(rotten-1)", /Expected a number/],
+  ["bad types for *", "Plant(rotten*1)", /Expected a number/],
+  ["bad types for /", "Plant(rotten/1)", /Expected a number/],
+  ["bad types for **", "Plant(rotten**1)", /Expected a number/],
+  ["bad types for <", "Plant(rotten<1)", /Expected a number or string/],
+  ["bad types for <=", "Plant(rotten<=1)", /Expected a number or string/],
+  ["bad types for >", "Plant(rotten>1)", /Expected a number or string/],
+  ["bad types for >=", "Plant(rotten>=1)", /Expected a number or string/],
+  ["return type mismatch", "pick f() -> Int: serve rotten|", /boolean to a int/],
+  ["diff type array elements", "Plant((3,ripe))", /Not all elements have the same type/],
 
   //   ["non-distinct fields", "struct S {x: boolean x: int}", /Fields must be distinct/],
   //   ["non-int decrement", 'let x=some[""];x++;', /an integer/],
@@ -214,23 +187,15 @@ const semanticErrors = [
 describe("The analyzer", () => {
   for (const [scenario, source] of semanticChecks) {
     it(`recognizes ${scenario}`, () => {
-      assert.ok(analyze(parse(source)))
-    })
+      assert.ok(analyze(parse(source)));
+    });
   }
   for (const [scenario, source, errorMessagePattern] of semanticErrors) {
     it(`throws on ${scenario}`, () => {
-      assert.throws(() => analyze(parse(source)), errorMessagePattern)
-    })
+      assert.throws(() => analyze(parse(source)), errorMessagePattern);
+    });
   }
   it("produces the expected representation for a trivial program", () => {
-    assert.deepEqual(
-      analyze(parse("let x = π + 2.2;")),
-      program([
-        variableDeclaration(
-          variable("x", false, floatType),
-          binary("+", variable("π", true, floatType), 2.2, floatType)
-        ),
-      ])
-    )
-  })
-})
+    assert.deepEqual(analyze(parse("let Int x = 5 + 2")), program([variableDeclaration(variable("x", intType), binary("+", 5, 2, intType))]));
+  });
+});

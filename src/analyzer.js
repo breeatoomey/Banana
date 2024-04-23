@@ -13,6 +13,7 @@ const FLOAT = core.floatType
 const STRING = core.stringType
 const BOOLEAN = core.boolType
 const VOID = core.voidType
+const ANY = core.anyType
 
 class Context {
   // Like most statically-scoped languages, Carlos contexts will contain a
@@ -134,9 +135,9 @@ export default function analyze(match) {
     must(t?.kind === "ArrayType", "Must be an array type", at)
   }
 
-  function mustBeAVariable(entity, at) {
-    must(entity?.kind === "Variable", `Functions can not appear here`, at)
-  }
+  // function mustBeAVariable(entity, at) {
+  //   must(entity?.kind === "Variable", `Functions can not appear here`, at)
+  // }
 
   function mustBeAFunction(entity, at) {
     must(entity?.kind === "Function", `${entity.name} is not a function`, at)
@@ -161,6 +162,7 @@ export default function analyze(match) {
 
   function assignable(fromType, toType) {
     return (
+      toType == ANY ||
       equivalent(fromType, toType) ||
       (fromType?.kind === "FunctionType" &&
         toType?.kind === "FunctionType" &&
@@ -325,6 +327,52 @@ export default function analyze(match) {
       return core.returnStatement(return_expression)
     },
 
+    Stmt_call(call) {
+      return call.rep()
+    },
+    
+    ForStmt_collection(_for, id, _in, exp, block) {
+      const collection = exp.rep()
+      mustHaveAnArrayType(collection, { at: exp })
+      const iterator = core.variable(id.sourceString, collection.type.base_type)
+      context = context.newChildContext({ inLoop: true })
+      context.add(iterator.name, iterator)
+      const body = block.rep()  
+      context = context.parent
+      return core.forStatement(iterator, collection, body)
+    },
+
+    WhileStmt(_while, exp, block) {
+      const test = exp.rep()
+      mustHaveBooleanType(test, { at: exp })
+      context = context.newChildContext({ inLoop: true })
+      const body = block.rep()
+      context = context.parent
+      return core.whileStatement(test, body)
+    },
+
+    IfStmt_long(_if, exp, block1, _else, block2) {
+      const test = exp.rep()
+      mustHaveBooleanType(test, { at: exp })
+      context = context.newChildContext()
+      const consequent = block1.rep()
+      context = context.parent
+      context = context.newChildContext()
+      const alternate = block2.rep()
+      context = context.parent
+      return core.longIfStatement(test, consequent, alternate)
+    },
+
+    IfStmt_elsif(_if, exp, block, _else, trailingIfStatement) {
+      const test = exp.rep()
+      mustHaveBooleanType(test, { at: exp })
+      context = context.newChildContext()
+      const consequent = block.rep()
+      context = context.parent
+      const alternate = trailingIfStatement.rep()
+      return core.longIfStatement(test, consequent, alternate)
+    },
+
     Type_array(_arr, _left, base_type, _right) {
       return core.arrayType(base_type.rep())
     },
@@ -354,29 +402,59 @@ export default function analyze(match) {
     },
 
     Exp1_binary(exp1, op, exp2) {
-      return core.binary(op.sourceString, exp1.rep(), exp2.rep())
+      let left = exp1.rep()
+      mustHaveBooleanType(left, { at: exp1})
+      for (let e of exp2.children) {
+        let right = e.rep()
+        mustHaveBooleanType(right, { at: e })
+        left = core.binary(op.sourceString, left, right, BOOLEAN)
+      }
+      return left
     },
 
     Exp2_binary(exp1, op, exp2) {
-      return core.binary(op.sourceString, exp1.rep(), exp2.rep())
+      let left = exp1.rep()
+      mustHaveBooleanType(left, { at: exp1})
+      for (let e of exp2.children) {
+        let right = e.rep()
+        mustHaveBooleanType(right, { at: e })
+        left = core.binary(op.sourceString, left, right, BOOLEAN)
+      }
+      return left
     },
 
-    Exp3_binary(exp1, op, exp2) {
-      return core.binary(op.sourceString, exp1.rep(), exp2.rep())
+    Exp3_binary(exp1, relop, exp2) {
+      const [left, op, right] = [exp1.rep(), relop.sourceString, exp2.rep()]
+      if (["<", "<=", ">", ">="].includes(op)) {
+        mustHaveNumericOrStringType(left, { at: exp1 })
+      }
+      mustBothHaveTheSameType(left, right, { at: relop })
+      return core.binary(op, left, right, BOOLEAN)
     },
 
     Exp4_binary(exp1, addOp, exp2) {
       const [left, op, right] = [exp1.rep(), addOp.sourceString, exp2.rep()]
+      if (op === "+") {
+        mustHaveNumericOrStringType(left, { at: exp1 })
+      } else {
+        mustHaveNumericType(left, { at: exp1 })
+      }
       mustBothHaveTheSameType(left, right, { at: addOp })
       return core.binary(op, left, right, left.type)
     },
 
-    Exp5_binary(exp1, op, exp2) {
-      return core.binary(op.sourceString, exp1.rep(), exp2.rep())
+    Exp5_binary(exp1, mulOp, exp2) {
+      const [left, op, right] = [exp1.rep(), mulOp.sourceString, exp2.rep()]
+      mustHaveNumericType(left, { at: exp1 })
+      mustBothHaveTheSameType(left, right, { at: mulOp })
+      return core.binary(op, left, right, left.type)
     },
 
-    Exp6_binary(exp1, op, exp2) {
-      return core.binary(op.sourceString, exp1.rep(), exp2.rep())
+    Exp6_binary(exp1, powerOp, exp2) {
+      const [left, op, right] = [exp1.rep(), powerOp.sourceString, exp2.rep()]
+      mustHaveNumericType(left, { at: exp1 })
+      mustBothHaveTheSameType(left, right, { at: powerOp })
+      return core.binary(op, left, right, left.type)
     },
 
     Primitive_parens(_open, exp, _close) {
@@ -392,21 +470,27 @@ export default function analyze(match) {
     Primitive_id(id, _postfix) {
       // ids used in expressions must have been already declared and must
       // be bound to variable entities, not function entities.
-      const entity = context.lookup(id.sourceString)
-      mustHaveBeenFound(entity, id.sourceString, { at: id })
-      mustBeAVariable(entity, { at: id })
-      return entity
+      const entity = context.lookup(id.sourceString);
+      mustHaveBeenFound(entity, id.sourceString, { at: id });
+      //mustBeAVariable(entity, { at: id });
+      return entity;
     },
 
-    Primitive_call(id, _open, expList, _close) {
+    Primitive_call(id, open, expList, _close) {
       // ids used in calls must have already been declared and must be
       // bound to function entities, not to variable entities.
       const callee = context.lookup(id.sourceString)
       mustHaveBeenFound(callee, id.sourceString, { at: id })
       mustBeAFunction(callee, { at: id })
-      const args = expList.asIteration().children.map(arg => arg.rep())
-      mustHaveCorrectArgumentCount(args.length, callee.type.paramCount, { at: id })
-      return core.call(callee, args)
+      const exps = expList.asIteration().children
+      const targetTypes = callee.type.paramTypes
+      mustHaveCorrectArgumentCount(exps.length, callee.type.paramCount, { at: open })
+      const args = exps.map((exp, i) => {
+        const arg = exp.rep()
+        mustBeAssignable(arg, { toType: targetTypes[i] }, { at: exp })
+        return arg
+      })
+      return core.functionCall(callee, args)
     },
 
     Primitive_void(_) {
