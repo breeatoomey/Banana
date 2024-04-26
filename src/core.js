@@ -26,13 +26,13 @@ export function functionType(paramTypes, returnType, paramCount) {
   return { kind: "FunctionType", paramTypes, returnType, paramCount };
 }
 
-export function params(param) {
-  return { kind: "Params", param };
-}
+  // export function params(param) {
+  //   return { kind: "Params", param };
+  // }
 
-export function param(type, id, exp) {
-  return { kind: "Param", type, id, exp };
-}
+// export function param(type, id, exp) {
+//   return { kind: "Param", type, id, exp };
+// }
 
 export function shortIfStatement(test, consequent) {
   return { kind: "ShortIfStatement", test, consequent }
@@ -54,9 +54,9 @@ export function returnStatement(id, exp) {
   return { kind: "ReturnStatement", id, exp };
 }
 
-export function callStatement(call) {
-  return { kind: "CallStatement", call };
-}
+// export function callStatement(call) {
+//   return { kind: "CallStatement", call };
+// }
 
 export function functionCall(callee, args) {
   return { kind: "FunctionCall", callee, args, type: callee.type.returnType };

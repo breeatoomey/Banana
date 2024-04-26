@@ -87,30 +87,30 @@ export default function analyze(match) {
     must(e.type === BOOLEAN, "Expected a boolean", at)
   }
 
-  function mustHaveIntegerType(e, at) {
-    must(e.type === INT, "Expected an integer", at)
-  }
+  // function mustHaveIntegerType(e, at) {
+  //   must(e.type === INT, "Expected an integer", at)
+  // }
 
   function mustHaveAnArrayType(e, at) {
     must(e.type?.kind === "ArrayType", "Expected an array", at)
   }
 
-  function mustHaveAnOptionalType(e, at) {
-    must(e.type?.kind === "OptionalType", "Expected an optional", at)
-  }
+  // function mustHaveAnOptionalType(e, at) {
+  //   must(e.type?.kind === "OptionalType", "Expected an optional", at)
+  // }
 
-  function mustHaveAStructType(e, at) {
-    must(e.type?.kind === "StructType", "Expected a struct", at)
-  }
+  // function mustHaveAStructType(e, at) {
+  //   must(e.type?.kind === "StructType", "Expected a struct", at)
+  // }
 
-  function mustHaveAnOptionalStructType(e, at) {
-    // Used to check e?.x expressions, e must be an optional struct
-    must(
-      e.type?.kind === "OptionalType" && e.type.baseType?.kind === "StructType",
-      "Expected an optional struct",
-      at
-    )
-  }
+  // function mustHaveAnOptionalStructType(e, at) {
+  //   // Used to check e?.x expressions, e must be an optional struct
+  //   must(
+  //     e.type?.kind === "OptionalType" && e.type.baseType?.kind === "StructType",
+  //     "Expected an optional struct",
+  //     at
+  //   )
+  // }
 
   function mustBothHaveTheSameType(e1, e2, at) {
     must(equivalent(e1.type, e2.type), "Operands do not have the same type", at)
@@ -126,14 +126,14 @@ export default function analyze(match) {
     )
   }
 
-  function mustBeAType(e, at) {
-    // This is a rather ugly hack
-    must(e?.kind.endsWith("Type"), "Type expected", at)
-  }
+  // function mustBeAType(e, at) {
+  //   // This is a rather ugly hack
+  //   must(e?.kind.endsWith("Type"), "Type expected", at)
+  // }
 
-  function mustBeAnArrayType(t, at) {
-    must(t?.kind === "ArrayType", "Must be an array type", at)
-  }
+  // function mustBeAnArrayType(t, at) {
+  //   must(t?.kind === "ArrayType", "Must be an array type", at)
+  // }
 
   // function mustBeAVariable(entity, at) {
   //   must(entity?.kind === "Variable", `Functions can not appear here`, at)
@@ -146,9 +146,6 @@ export default function analyze(match) {
   function equivalent(t1, t2) {
     return (
       t1 === t2 ||
-      (t1?.kind === "OptionalType" &&
-        t2?.kind === "OptionalType" &&
-        equivalent(t1.baseType, t2.baseType)) ||
       (t1?.kind === "ArrayType" &&
         t2?.kind === "ArrayType" &&
         equivalent(t1.baseType, t2.baseType)) ||
@@ -166,10 +163,8 @@ export default function analyze(match) {
       equivalent(fromType, toType) ||
       (fromType?.kind === "FunctionType" &&
         toType?.kind === "FunctionType" &&
-        // covariant in return types
         assignable(fromType.returnType, toType.returnType) &&
         fromType.paramTypes.length === toType.paramTypes.length &&
-        // contravariant in parameter types
         toType.paramTypes.every((t, i) => assignable(t, fromType.paramTypes[i])))
     )
   }
@@ -178,8 +173,8 @@ export default function analyze(match) {
     switch (type.kind) {
       case "IntType":
         return "int"
-      case "FloatType":
-        return "float"
+      // case "FloatType":
+      //   return "float"
       case "StringType":
         return "string"
       case "BoolType":
@@ -188,16 +183,16 @@ export default function analyze(match) {
         return "void"
       case "AnyType":
         return "any"
-      case "StructType":
-        return type.name
+      // case "StructType":
+      //   return type.name
       case "FunctionType":
         const paramTypes = type.paramTypes.map(typeDescription).join(", ")
         const returnType = typeDescription(type.returnType)
         return `(${paramTypes})->${returnType}`
       case "ArrayType":
         return `[${typeDescription(type.base_type)}]`
-      case "OptionalType":
-        return `${typeDescription(type.base_type)}?`
+      // case "OptionalType":
+      //   return `${typeDescription(type.base_type)}?`
     }
   }
 
@@ -212,30 +207,30 @@ export default function analyze(match) {
     must(!e.readOnly, `Cannot assign to constant ${e.name}`, at)
   }
 
-  function mustHaveMember(structType, field, at) {
-    must(structType.fields.map(f => f.name).includes(field), "No such field", at)
-  }
+  // function mustHaveMember(structType, field, at) {
+  //   must(structType.fields.map(f => f.name).includes(field), "No such field", at)
+  // }
 
-  function mustBeInLoop(at) {
-    must(context.inLoop, "Break can only appear in a loop", at)
-  }
+  // function mustBeInLoop(at) {
+  //   must(context.inLoop, "Break can only appear in a loop", at)
+  // }
 
   function mustBeInAFunction(at) {
     must(context.function, "Return can only appear in a function", at)
   }
 
-  function mustBeCallable(e, at) {
-    const callable = e?.kind === "StructType" || e.type?.kind === "FunctionType"
-    must(callable, "Call of non-function or non-constructor", at)
-  }
+  // function mustBeCallable(e, at) {
+  //   const callable = e?.kind === "StructType" || e.type?.kind === "FunctionType"
+  //   must(callable, "Call of non-function or non-constructor", at)
+  // }
 
-  function mustNotReturnAnything(f, at) {
-    must(f.type.returnType === VOID, "Something should be returned", at)
-  }
+  // function mustNotReturnAnything(f, at) {
+  //   must(f.type.returnType === VOID, "Something should be returned", at)
+  // }
 
-  function mustReturnSomething(f, at) {
-    must(f.type.returnType !== VOID, "Cannot return a value from this function", at)
-  }
+  // function mustReturnSomething(f, at) {
+  //   must(f.type.returnType !== VOID, "Cannot return a value from this function", at)
+  // }
 
   function mustBeReturnable(e, { from: f }, at) {
     mustBeAssignable(e, { toType: f.type.returnType }, at)
@@ -398,13 +393,13 @@ export default function analyze(match) {
       return core.intType
     },
 
-    Type_string(_str_keyword) {
-      return core.stringType
-    },
+    // Type_string(_str_keyword) {
+    //   return core.stringType
+    // },
 
-    Exp_unary(op, exp) {
-      return core.unary(op.sourceString, exp.rep())
-    },
+    // Exp_unary(op, exp) {
+    //   return core.unary(op.sourceString, exp.rep())
+    // },
 
     Exp_ternary(exp1, _questionMark, _rightArrow, exp2, _doubleRightArrow, exp3) {
       return core.conditional(exp1.rep(), exp2.rep(), exp3.rep())
