@@ -351,6 +351,15 @@ export default function analyze(match) {
       return core.whileStatement(test, body)
     },
 
+    IfStmt_short(_if, exp, block) {
+      const test = exp.rep()
+      mustHaveBooleanType(test, { at: exp })
+      context = context.newChildContext()
+      const consequent = block.rep()
+      context = context.parent
+      return core.shortIfStatement(test, consequent)
+    },
+
     IfStmt_long(_if, exp, block1, _else, block2) {
       const test = exp.rep()
       mustHaveBooleanType(test, { at: exp })

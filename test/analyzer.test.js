@@ -29,22 +29,30 @@ const semanticChecks = [
   ["for loop", "let Bunch(Int) bananas = (0, 7, 14) for i in bananas: Plant(i)|"],
   ["while loop", "let Int x = 0 while x < 3: x = x + 1|"],
   ["nested loops", "for i in (1,2,3): for j in (4,5,6): Plant(i+j)||"],
+  ["nested if", "if ripe: if rotten: Plant(1)| else: Plant(2)|| else: Plant(3)|"],
+  ["nested if with return", "pick banana() -> Int: if ripe: if rotten: serve 1| else: serve 2|| else: serve 3||"],
+  ["nested if with for", "for i in (1,2,3): if ripe: Plant(1)| else: Plant(2)||"],
+  ["nested if with while", "let Int x = 0 while x < 3: if ripe: Plant(1)| else: Plant(2)|| x = x + 1"],
+  ["nested if with nested for", "for i in (1,2,3): if ripe: for j in (4,5,6): Plant(i+j)|| else: Plant(2)||"],
+  ["nested if with nested while", "let Int x = 0 while x < 3: if ripe: while ripe: Plant(1) x = x + 1|| else: Plant(2)||"],
+  ["nested if with nested if", "if ripe: if ripe: Plant(1)| else: Plant(2)|| else: Plant(3)|"],
+  ["nested if in for loop", 
+  `pick banana(Int quota, Bunch(Int) bananas-collected) -> Boo:
+	  for i in bananas-collected:
+    	if i > quota:
+        	Plant('👍')|
+        else if i < quota:
+        	Plant('👎')
+          serve rotten|
+          
+    Plant('Enough bananas collected this week!')
+    serve ripe
+	|
+|`],
 
-  ["nested if", "if true {if false {Plant(1)} else {Plant(2)}} else {Plant(3)}"],
-  
-  ["nested if with return", "if true {if false {serve 1} else {serve 2}} else {serve 3}"],
-  ["nested if with break", "while true {if true {break} else {Plant(1)}}"],
-  ["nested if with repeat", "repeat 3 {if true {Plant(1)} else {Plant(2)}}"],
-  ["nested if with for", "for i in [1,2,3] {if true {Plant(1)} else {Plant(2)}}"],
-  ["nested if with while", "let Int x = 0 while x < 3 {if true {Plant(1)} else {Plant(2)} x = x + 1}"],
-  ["nested if with nested for", "for i in [1,2,3] {if true {for j in [4,5,6] {Plant(i+j)}} else {Plant(2)}}"],
-  ["nested if with nested while", "let Int x = 0 while x < 3 {if true {while true {Plant(1)} x = x + 1} else {Plant(2)}}"],
-  ["nested if with nested repeat", "repeat 3 {if true {repeat 3 {Plant(1)}} else {Plant(2)}}"],
-  ["nested if with nested if", "if true {if true {Plant(1)} else {Plant(2)}} else {Plant(3)}"],
-  ["nested if with nested return", "if true {if true {serve 1} else {serve 2}} else {serve 3}"],
-  ["nested if with nested break", "while true {if true {break} else {Plant(1)}}"],
-  ["nested if with nested for", "for i in [1,2,3] {if true {Plant(1)} else {Plant(2)}}"],
-
+  // ["nested if with nested return", "if true {if true {serve 1} else {serve 2}} else {serve 3}"],
+  // ["nested if with nested break", "while true {if true {break} else {Plant(1)}}"],
+  // ["nested if with nested for", "for i in [1,2,3] {if true {Plant(1)} else {Plant(2)}}"],
   // ["assign to array element", "let Bunch(Int) a = (1,2,3) a(1)=100"],
   //   ["assign optionals", "let a = no int;let b=some 1;a=b;b=a;"],
   //   ["return in nested if", "function f() {if true {return;}}"],

@@ -34,6 +34,10 @@ export function param(type, id, exp) {
   return { kind: "Param", type, id, exp };
 }
 
+export function shortIfStatement(test, consequent) {
+  return { kind: "ShortIfStatement", test, consequent }
+}
+
 export function longIfStatement(test, consequent, alternate) {
   return { kind: "LongIfStatement", test, consequent, alternate }
 }
