@@ -1,21 +1,20 @@
-import {
-  voidType,
-  standardLibrary,
-} from "./core.js";
+import { voidType, standardLibrary } from "./core.js";
 // export default function generate() {
 //   throw new Error("Not yet implemented")
 // }
 export default function generate(program) {
   const output = [];
-  
-  const standardFunctions = new Map([[standardLibrary.Plant, (x) => `console.log(${x})`]]);
+
+  const standardFunctions = new Map([
+    [standardLibrary.Plant, (x) => `console.log(${x})`],
+  ]);
 
   const targetName = ((mapping) => {
     return (entity) => {
       if (!mapping.has(entity)) {
         mapping.set(entity, mapping.size + 1);
       }
-      return `${entity.name}_${mapping.get(entity)}`;
+      return `${entity.name ?? entity.id}_${mapping.get(entity)}`;
     };
   })(new Map());
 
@@ -52,7 +51,7 @@ export default function generate(program) {
       output.push("break;");
     },
     ReturnStatement(s) {
-      output.push(`${gen(s.id)} return ${gen(s.exp)};`);
+      output.push(`return ${gen(s.exp)};`);
     },
     LongIfStatement(s) {
       output.push(`if (${gen(s.test)}) {`);

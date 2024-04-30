@@ -50,8 +50,8 @@ export function forStatement(id, exp, body) {
   return { kind: "ForStatement", id, exp, body };
 }
 
-export function returnStatement(id, exp) {
-  return { kind: "ReturnStatement", id, exp };
+export function returnStatement(exp) {
+  return { kind: "ReturnStatement", exp };
 }
 
 export const fullStatement = { kind: "FullStatement" };
