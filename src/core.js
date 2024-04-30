@@ -26,20 +26,20 @@ export function functionType(paramTypes, returnType, paramCount) {
   return { kind: "FunctionType", paramTypes, returnType, paramCount };
 }
 
-  // export function params(param) {
-  //   return { kind: "Params", param };
-  // }
+// export function params(param) {
+//   return { kind: "Params", param };
+// }
 
 // export function param(type, id, exp) {
 //   return { kind: "Param", type, id, exp };
 // }
 
 export function shortIfStatement(test, consequent) {
-  return { kind: "ShortIfStatement", test, consequent }
+  return { kind: "ShortIfStatement", test, consequent };
 }
 
 export function longIfStatement(test, consequent, alternate) {
-  return { kind: "LongIfStatement", test, consequent, alternate }
+  return { kind: "LongIfStatement", test, consequent, alternate };
 }
 
 export function whileStatement(test, body) {
@@ -67,7 +67,7 @@ export function args(exp) {
 }
 
 export function assignment(id, exp) {
-  return { kind: "Assignement", id, exp };
+  return { kind: "Assignment", id, exp };
 }
 
 export function unary(op, operand, type) {
@@ -94,7 +94,7 @@ export const boolType = { kind: "BoolType" };
 export const voidType = { kind: "VoidType" };
 export const intType = { kind: "IntType" };
 export const stringType = { kind: "StringType" };
-export const anyType = { kind: "AnyType" }
+export const anyType = { kind: "AnyType" };
 
 String.prototype.type = stringType;
 Number.prototype.type = intType;
