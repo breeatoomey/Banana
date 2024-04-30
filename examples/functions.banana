@@ -1,0 +1,11 @@
+let Int z = 5
+pick f( Int x, Boo y) -> Boo :
+if x>10:
+    Plant(x)
+serve ripe|
+serve y|
+
+pick g()-> Boo :
+serve rotten|
+
+f(z, g()) 
