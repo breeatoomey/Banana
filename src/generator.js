@@ -1,25 +1,13 @@
 import {
   voidType,
   standardLibrary,
-  variableDeclaration,
-  program,
-  functionDeclaration,
-  variable,
-  assignment,
-  returnStatement,
-  longIfStatement,
-  shortIfStatement,
-  forStatement,
-  conditional,
-  arrayExpression,
-  functionCall,
 } from "./core.js";
 // export default function generate() {
 //   throw new Error("Not yet implemented")
 // }
 export default function generate(program) {
   const output = [];
-
+  
   const standardFunctions = new Map([[standardLibrary.Plant, (x) => `console.log(${x})`]]);
 
   const targetName = ((mapping) => {
@@ -51,12 +39,18 @@ export default function generate(program) {
     Function(f) {
       return targetName(f);
     },
+    Increment(s) {
+      output.push(`${gen(s.variable)}++;`);
+    },
+    Decrement(s) {
+      output.push(`${gen(s.variable)}--;`);
+    },
     Assignment(s) {
       output.push(`${gen(s.id)} = ${gen(s.exp)};`);
     },
-    // BreakStatement(s) {
-    //   output.push("break;");
-    // },
+    FullStatement(s) {
+      output.push("break;");
+    },
     ReturnStatement(s) {
       output.push(`${gen(s.id)} return ${gen(s.exp)};`);
     },
@@ -77,13 +71,20 @@ export default function generate(program) {
       s.consequent.forEach(gen);
       output.push("}");
     },
+    WhileStatement(s) {
+      output.push(`while (${gen(s.test)}) {`);
+      s.body.forEach(gen);
+      output.push("}");
+    },
     ForStatement(s) {
       output.push(`for (let ${gen(s.id)} of ${gen(s.exp)}) {`);
       s.body.forEach(gen);
       output.push("}");
     },
     Conditional(e) {
-      return `((${gen(e.test)}) ? (${gen(e.consequent)}) : (${gen(e.alternate)}))`;
+      return `((${gen(e.test)}) ? -> (${gen(e.consequent)}) ->> (${gen(
+        e.alternate
+      )}))`;
     },
     BinaryExpression(e) {
       //const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op
@@ -97,7 +98,9 @@ export default function generate(program) {
       return `[${e.elements.map(gen).join(",")}]`;
     },
     FunctionCall(c) {
-      const targetCode = standardFunctions.has(c.callee) ? standardFunctions.get(c.callee)(c.args.map(gen)) : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`;
+      const targetCode = standardFunctions.has(c.callee)
+        ? standardFunctions.get(c.callee)(c.args.map(gen))
+        : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`;
       // Calls in expressions vs in statements are handled differently
       if (c.callee.type.returnType !== voidType) {
         return targetCode;

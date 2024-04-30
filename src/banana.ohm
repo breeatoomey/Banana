@@ -3,12 +3,15 @@ Banana {
 
   Stmt = VarDecl
        | FunDecl
-       | Assignment 
+       | Bump                  -- bump
+       | Assignment            -- assign
        | Primitive_call        -- call
+       | FullStmt              -- break
+       | ReturnStmt            -- return
        | IfStmt 
        | WhileStmt 
        | ForStmt
-       | ReturnStmt
+       
 
   VarDecl = let Type id "=" Exp
   FunDecl = func id "(" Params ")" "->" Type Body
@@ -25,8 +28,10 @@ Banana {
        | string               -- string
        | id                   -- modeltype
 
-  Assignment = Primitive "=" Exp      
+  Bump = Primitive ("++" | "--")
 
+  Assignment = Primitive "=" Exp      
+  FullStmt = break
   ReturnStmt = return Exp         
   ForStmt = for id in Exp Body     -- collection
   WhileStmt = while Exp Body
@@ -52,14 +57,14 @@ Banana {
             | Exp6
   Exp6      = Primitive "**" Exp6                                -- binary
             | Primitive
-  Primitive = "(" Exp ")"                                   -- parens
-            |"(" NonemptyListOf<Exp, ","> ")"             -- arrayexp
-            | num                                          -- num
-            | true               					    -- true
-            | false								    -- false
-            | id "(" ListOf<Exp, ","> ")"                  -- call
+  Primitive = "(" Exp ")" ~mut                            -- parens
+            |"(" NonemptyListOf<Exp, ","> ")"              -- arrayexp
+            | num ~mut                                    -- num
+            | true ~mut              					    -- true
+            | false	~mut							    -- false
+            | id "(" ListOf<Exp, ","> ")" ~mut                 -- call
             | id "!"?                                      -- id
-            | stringlit                                    -- string
+            | stringlit ~mut                              -- string
             | void                                    -- void
 
 
@@ -81,6 +86,7 @@ Banana {
   switch = "switch" ~idchar
   case = "case" ~idchar
   default = "default" ~idchar
+  break = "full" ~alnum
   return = "serve" ~idchar
   try = "try" ~idchar
   catch = "catch" ~idchar
@@ -96,17 +102,18 @@ Banana {
 
 
   keyword = string | int | boolean | array | func | let | self
-          | enum | while | if | else | switch | case | default | return | for | void
+          | enum | while | break | if | else | switch | case | default | return | for | void
           | null | true | false | in | ctor 
 
   id = ~keyword letter idchar*
-  idchar = alnum | "-" 
+  idchar = alnum | "_" 
   num = digit+ ("." digit+)? (("e" | "E") ("+" | "-")? digit+)?
 
   stringlit = "\'" char* "\'"
   char = "\\u{" hexDigit+ "}"   --codepoint
        | "\\" any               --nonbackslash
        | ~"\'" any
+  mut = ~"==" "=" | "++" | "--"
 
   space += "//" (~"\n" any)*  --comment
 }

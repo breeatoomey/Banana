@@ -87,9 +87,9 @@ export default function analyze(match) {
     must(e.type === BOOLEAN, "Expected a boolean", at)
   }
 
-  // function mustHaveIntegerType(e, at) {
-  //   must(e.type === INT, "Expected an integer", at)
-  // }
+  function mustHaveIntegerType(e, at) {
+    must(e.type === INT, "Expected an integer", at)
+  }
 
   function mustHaveAnArrayType(e, at) {
     must(e.type?.kind === "ArrayType", "Expected an array", at)
@@ -211,9 +211,9 @@ export default function analyze(match) {
   //   must(structType.fields.map(f => f.name).includes(field), "No such field", at)
   // }
 
-  // function mustBeInLoop(at) {
-  //   must(context.inLoop, "Break can only appear in a loop", at)
-  // }
+  function mustBeInLoop(at) {
+    must(context.inLoop, "Full can only appear in a loop", at)
+  }
 
   function mustBeInAFunction(at) {
     must(context.function, "Return can only appear in a function", at)
@@ -273,7 +273,7 @@ export default function analyze(match) {
       // Parameters are part of the child context
       context = context.newChildContext({ inLoop: false, function: func });
       const params = parameters.rep();
-      
+
       // Now that the parameters are known, we compute the function's type.
       // This is fine; we did not need the type to analyze the parameters,
       // but we do need to set it before analyzing the body.
@@ -309,7 +309,15 @@ export default function analyze(match) {
       context.add(id.sourceString, variable);
       return core.variableDeclaration(variable, initializer);
     },
-
+    
+    Bump(exp, operator) {
+      const variable = exp.rep();
+      mustHaveIntegerType(variable, { at: exp });
+      return operator.sourceString === "++"
+        ? core.increment(variable)
+        : core.decrement(variable);
+    },
+    
     Assignment(variable, _eq, expression) {
       const source = expression.rep();
       const target = variable.rep();
@@ -337,6 +345,11 @@ export default function analyze(match) {
 
     Stmt_call(call) {
       return call.rep();
+    },
+
+    FullStmt(fullKeyword) {
+      mustBeInLoop({ at: fullKeyword });
+      return core.fullStatement;
     },
 
     ForStmt_collection(_for, id, _in, exp, block) {
@@ -412,7 +425,7 @@ export default function analyze(match) {
     // Type_string(_str_keyword) {
     //   return core.stringType
     // },
-    
+
     Exp_unary(unaryOp, exp) {
       const [op, operand] = [unaryOp.sourceString, exp.rep()];
       let type;
@@ -425,7 +438,7 @@ export default function analyze(match) {
       }
       return core.unary(op, operand, type);
     },
-    
+
     Exp_ternary(
       exp1,
       _questionMark,

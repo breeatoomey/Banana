@@ -7,7 +7,7 @@ import { program, variableDeclaration, variable, binary, intType } from "../src/
 const semanticChecks = [
   ["variable declarations", "let Int x = 1 let Boo y = rotten"],
   ["complex array types", "pick f(Bunch(Bunch(Int)) x) -> Bunch(Bunch(Int)): serve x |"],
-  ["increment and decrement", "let Int x = 10 x = x - 1 x = x + 1"],
+  ["increment and decrement", "let Int x = 10 x-- x++"],
   ["initialize array with correct types", "let Bunch(int) a = (1,2,3)"],
   ["assign arrays", "let Bunch(Int) a = (1) let Bunch(Int) b = (2) a = b b = a"],
   ["void return", "pick f() -> Nothing: serve Nothing |"],
@@ -37,8 +37,8 @@ const semanticChecks = [
   ["nested if with nested while", "let Int x = 0 while x < 3: if ripe: while ripe: Plant(1) x = x + 1|| else: Plant(2)||"],
   ["nested if with nested if", "if ripe: if ripe: Plant(1)| else: Plant(2)|| else: Plant(3)|"],
   ["nested if in for loop", 
-  `pick banana(Int quota, Bunch(Int) bananas-collected) -> Boo:
-	  for i in bananas-collected:
+  `pick banana(Int quota, Bunch(Int) bananas_collected) -> Boo:
+	  for i in bananas_collected:
     	if i > quota:
         	Plant('👍')|
         else if i < quota:

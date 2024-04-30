@@ -54,6 +54,8 @@ export function returnStatement(id, exp) {
   return { kind: "ReturnStatement", id, exp };
 }
 
+export const fullStatement = { kind: "FullStatement" };
+
 // export function callStatement(call) {
 //   return { kind: "CallStatement", call };
 // }
@@ -64,6 +66,14 @@ export function functionCall(callee, args) {
 
 export function args(exp) {
   return { kind: "Args", exp };
+}
+
+export function increment(variable) {
+  return { kind: "Increment", variable };
+}
+
+export function decrement(variable) {
+  return { kind: "Decrement", variable };
 }
 
 export function assignment(id, exp) {
