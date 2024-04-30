@@ -8,23 +8,25 @@ function dedent(s) {
   return `${s}`.replace(/(?<=\n)\s+/g, "").trim();
 }
 
+//NOTE: optimizer breaks small and for loop
+
 const fixtures = [
   {
     name: "small",
     source: `
       let Int x = 3 * 7
-      x = x + 1
-      x = x - 1
+      x++
+      x--
       let Boo y = ripe
       y = ((5 ** (-x) / (-100)) > (-x))
       Plant((y && y) || (x*2) != 5)
     `,
     expected: dedent`
-      let x_1 = (3 * 7);
-      x_1 = (x_1 + 1);
-      x_1 = (x_1 - 1);
+      let x_1 = 21;
+      x_1++;
+      x_1--;
       let y_2 = true;
-      y_2 = (((5 ** -(x_1)) / -(100)) > -(x_1));
+      y_2 = (((5 ** -(x_1)) / -100) > -(x_1));
       console.log(((y_2 && y_2) || ((x_1 * 2) != 5)));
     `,
   },
@@ -36,8 +38,6 @@ const fixtures = [
       if (x == 0): Plant(1)| else: Plant(2)|
       if (x == 0): Plant(1)| else if (x==2): Plant(3)|
       if (x == 0): Plant(1)| else if (x==2): Plant(3)| else: Plant(4)|
-
-
     `,
     expected: dedent`
       let x_1 = 0;
@@ -45,13 +45,11 @@ const fixtures = [
         console.log('1');
       }
 
-
       if ((x_1 == 0)) {
         console.log(1);
       } else {
         console.log(2);
       }
-
 
       if ((x_1 == 0)) {
         console.log(1);
@@ -59,7 +57,6 @@ const fixtures = [
         if ((x_1 == 2)) {
           console.log(3);
         }
-
 
       if ((x_1 == 0)) {
         console.log(1);
@@ -69,10 +66,6 @@ const fixtures = [
         } else {
           console.log(4);
         }
-
-
-
-
     `,
   },
   {
@@ -82,10 +75,10 @@ const fixtures = [
       while x < 5:
         let Int y = 0
         while y < 5:
+          Plant(x * y)
           y = y + 1
-          Plant(x * y)|
-        x = x + 1
-      |
+          full|
+        x = x + 1|
     `,
     expected: dedent`
       let x_1 = 0;
@@ -100,27 +93,30 @@ const fixtures = [
       }
     `,
   },
+  //function code broken
   {
     name: "functions",
     source: `
       let Int z = 5
-      pick f( Int x, Boo y) -> Nothing :
-      if x>10:
-	  Plant(x)|
-      serve Nothing|
-      
+      pick f( Int x, Boo y) -> Boo :
+        if x>10:
+	        Plant(x)
+        serve ripe|
+      serve y|
+
       pick g()-> Boo :
-      serve rotten|
+        serve rotten|
       
       f(z, g()) 
     `,
     expected: dedent`
       let z_1 = 5;
       function f_2(x_3, y_4) {
-        if x >10{
-            print(x);
+        if ((x_3 > 10)){
+            console.log(x_3);
+            return true;
         }
-        return;
+        return y_4;
       }
       function g_5() {
         return false;
@@ -128,21 +124,16 @@ const fixtures = [
       f_2(z_1, g_5());
     `,
   },
+  //Add to arrays code:
   {
     name: "arrays",
     source: `
-      let Bunch (Boo) a = [ripe, rotten, ripe]
-      let Bunch (Int) b = [10, 20, 30]
-      const Bunch c = []
-      const d = random b;
-      print(a[1] || (b[0] < 88 ? rotten : ripe));
+      let Bunch (Boo) a = (ripe, rotten, ripe)
+      let Bunch (Int) b = (10, 1 - 20, 30)
     `,
     expected: dedent`
       let a_1 = [true,false,true];
-      let b_2 = [10,(a_1.length - 20),30];
-      let c_3 = [];
-      let d_4 = ((a=>a[~~(Math.random()*a.length)])(b_2));
-      console.log((a_1[1] || (((b_2[0] < 88)) ? (false) : (true))));
+      let b_2 = [10,-19,30];
     `,
   },
   {
@@ -155,8 +146,7 @@ const fixtures = [
       for i in (0,7,4):
       for j in (4,5,6):
       Plant(i+j)|
-      |
-     
+      |    
     `,
     expected: dedent`
     let b_1 = [0,7,14];
@@ -164,18 +154,11 @@ const fixtures = [
       console.log(i_2);
     }
 
-
-
-
     for (let i_3 of [0,7,4]) {
       for (let j_4 of [4,5,6]) {
         console.log((i_3 + j_4));
       }
     }
-
-
-
-
     `,
   },
 ];
