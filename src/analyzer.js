@@ -465,7 +465,11 @@ export default function analyze(match) {
       _doubleRightArrow,
       exp3
     ) {
-      return core.conditional(exp1.rep(), exp2.rep(), exp3.rep());
+      const test = exp1.rep();
+      mustHaveBooleanType(test, { at: exp1 });
+      const [consequent, alternate] = [exp2.rep(), exp3.rep()];
+      mustBothHaveTheSameType(consequent, alternate, { at: exp2 });
+      return core.conditional(test, consequent, alternate, consequent.type);
     },
 
     Exp1_binary(exp1, op, exp2) {

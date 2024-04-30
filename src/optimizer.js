@@ -31,7 +31,7 @@ const optimizers = {
     return p;
   },
   VariableDeclaration(d) {
-   // d.variable = optimize(d.variable);
+    // d.variable = optimize(d.variable);
     d.initializer = optimize(d.initializer);
     return d;
   },
@@ -109,21 +109,6 @@ const optimizers = {
     s.body = s.body.flatMap(optimize);
     return s;
   },
-  ForRangeStatement(s) {
-    s.iterator = optimize(s.iterator);
-    s.low = optimize(s.low);
-    s.op = optimize(s.op);
-    s.high = optimize(s.high);
-    s.body = s.body.flatMap(optimize);
-    if (s.low.constructor === Number) {
-      if (s.high.constructor === Number) {
-        if (s.low > s.high) {
-          return [];
-        }
-      }
-    }
-    return s;
-  },
   ForStatement(s) {
     s.id = optimize(s.id);
     s.exp = optimize(s.exp);
@@ -143,12 +128,7 @@ const optimizers = {
     //e.op = optimize(e.op);
     e.left = optimize(e.left);
     e.right = optimize(e.right);
-    if (e.op === "??") {
-      // Coalesce empty optional unwraps
-      if (e.left?.kind === "EmptyOptional") {
-        return e.right;
-      }
-    } else if (e.op === "&&") {
+    if (e.op === "&&") {
       // Optimize boolean constants in && and ||
       if (e.left === true) return e.right;
       if (e.right === true) return e.left;
@@ -199,11 +179,6 @@ const optimizers = {
     return e;
   },
   FunctionCall(c) {
-    c.callee = optimize(c.callee);
-    c.args = c.args.map(optimize);
-    return c;
-  },
-  ConstructorCall(c) {
     c.callee = optimize(c.callee);
     c.args = c.args.map(optimize);
     return c;

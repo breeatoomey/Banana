@@ -64,10 +64,6 @@ export function functionCall(callee, args) {
   return { kind: "FunctionCall", callee, args, type: callee.type.returnType };
 }
 
-export function args(exp) {
-  return { kind: "Args", exp };
-}
-
 export function increment(variable) {
   return { kind: "Increment", variable };
 }

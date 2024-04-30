@@ -112,7 +112,7 @@ const fixtures = [
     expected: dedent`
       let z_1 = 5;
       function f_2(x_3, y_4) {
-        if ((x_3 > 10)){
+        if ((x_3 > 10)) {
             console.log(x_3);
             return true;
         }
