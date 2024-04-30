@@ -13,14 +13,15 @@ import {
   conditional,
   arrayExpression,
   functionCall,
-} from "./core";
+} from "./core.js";
 // export default function generate() {
 //   throw new Error("Not yet implemented")
 // }
-export default function generate() {
+export default function generate(program) {
   const output = [];
 
-  //const standardFunctions
+  const standardFunctions = new Map([[standardLibrary.Plant, (x) => `console.log(${x})`]]);
+
   const targetName = ((mapping) => {
     return (entity) => {
       if (!mapping.has(entity)) {
@@ -39,7 +40,7 @@ export default function generate() {
     VariableDeclaration(d) {
       output.push(`let ${gen(d.variable)} = ${gen(d.initializer)};`);
     },
-    FunDeclaration(d) {
+    FunDecl(d) {
       output.push(`function ${gen(d.func)}(${d.params.map(gen).join(", ")}) {`);
       d.body.forEach(gen);
       output.push("}");
@@ -53,8 +54,11 @@ export default function generate() {
     Assignment(s) {
       output.push(`${gen(s.id)} = ${gen(s.exp)};`);
     },
+    // BreakStatement(s) {
+    //   output.push("break;");
+    // },
     ReturnStatement(s) {
-      output.push(`return ${gen(s.exp)};`);
+      output.push(`${gen(s.id)} return ${gen(s.exp)};`);
     },
     LongIfStatement(s) {
       output.push(`if (${gen(s.test)}) {`);
@@ -89,7 +93,7 @@ export default function generate() {
       const operand = gen(e.operand);
       return `${e.op}(${operand})`;
     },
-    ArrayExpression(E) {
+    ArrayExpression(e) {
       return `[${e.elements.map(gen).join(",")}]`;
     },
     FunctionCall(c) {
