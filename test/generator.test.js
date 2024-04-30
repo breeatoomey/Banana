@@ -102,26 +102,26 @@ const fixtures = [
         if x>10:
 	        Plant(x)
         serve ripe|
-      serve y|
+      serve rotten|
 
       pick g()-> Boo :
         serve rotten|
       
-      f(z, g()) 
+      let Boo y = f(z, g())
     `,
     expected: dedent`
       let z_1 = 5;
       function f_2(x_3, y_4) {
         if ((x_3 > 10)) {
             console.log(x_3);
-            return true;
+        return true;
         }
-        return y_4;
+        return false;
       }
       function g_5() {
         return false;
       }
-      f_2(z_1, g_5());
+      let y_6 = f_2(z_1, g_5());
     `,
   },
   //Add to arrays code:
