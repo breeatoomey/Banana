@@ -1,3 +1,4 @@
+
 // Static Analyzer for the Banana Language
 
 import * as core from "./core.js";
@@ -325,6 +326,10 @@ export default function analyze(match) {
 
     Type_int(_int_keyword) {
       return core.intType;
+    },
+
+    Type_string(_string_keyword) {
+      return core.stringType;
     },
 
     Exp_unary(unaryOp, exp) {
