@@ -1,7 +1,5 @@
 import { voidType, standardLibrary } from "./core.js";
-// export default function generate() {
-//   throw new Error("Not yet implemented")
-// }
+
 export default function generate(program) {
   const output = [];
 
@@ -86,7 +84,6 @@ export default function generate(program) {
       )}))`;
     },
     BinaryExpression(e) {
-      //const op = { "==": "===", "!=": "!==" }[e.op] ?? e.op
       return `(${gen(e.left)} ${e.op} ${gen(e.right)})`;
     },
     UnaryExpression(e) {
@@ -100,7 +97,7 @@ export default function generate(program) {
       const targetCode = standardFunctions.has(c.callee)
         ? standardFunctions.get(c.callee)(c.args.map(gen))
         : `${gen(c.callee)}(${c.args.map(gen).join(", ")})`;
-      // Calls in expressions vs in statements are handled differently
+
       if (c.callee.type.returnType !== voidType) {
         return targetCode;
       }

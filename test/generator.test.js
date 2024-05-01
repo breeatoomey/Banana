@@ -161,6 +161,41 @@ const fixtures = [
     }
     `,
   },
+  {
+    name: "ternary statement",
+    source: `
+      let Boo x = ripe
+      let Boo y = rotten 
+      let Boo z = ripe
+      Plant(x ? -> y ->> z)
+    `,
+    expected: dedent`
+      let x_1 = true;
+      let y_2 = false;
+      let z_3 = true;
+      console.log(((x_1) ? -> (y_2) ->> (z_3)));
+    `,
+  },
+  {
+    name: "for within function",
+    source: `
+      pick banana(Bunch(Int) nums) -> Boo:
+        for i in nums:
+          if i == 7:
+            serve ripe|
+        |
+      |
+    `,
+    expected: dedent`
+      function banana_1(nums_2) {
+      for (let i_3 of nums_2) {
+      if ((i_3 == 7)) {
+      return true;
+      }
+      }
+      }
+    `,
+  },
 ];
 
 describe("The code generator", () => {

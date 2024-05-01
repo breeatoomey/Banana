@@ -1,23 +1,4 @@
-// The optimizer module exports a single function, optimize(node), to perform
-// machine-independent optimizations on the analyzed semantic representation.
-//
-// The only optimizations supported here are:
-//
-//   - assignments to self (x = x) turn into no-ops
-//   - constant folding
-//   - some strength reductions (+0, -0, *0, *1, etc.)
-//   - turn references to built-ins true and false to be literals
-//   - remove all disjuncts in || list after literal true
-//   - remove all conjuncts in && list after literal false
-//   - while-false becomes a no-op
-//   - repeat-0 is a no-op
-//   - for-loop over empty array is a no-op
-//   - for-loop with low > high is a no-op
-//   - if-true and if-false reduce to only the taken arm
-//
-// The optimizer also replaces token references with their actual values,
-// since the original token line and column numbers are no longer needed.
-// This simplifies code generation.
+// The optimizer module for the Banana language.
 
 import * as core from "./core.js";
 
@@ -31,17 +12,7 @@ const optimizers = {
     return p;
   },
   VariableDeclaration(d) {
-    // d.variable = optimize(d.variable);
     d.initializer = optimize(d.initializer);
-    return d;
-  },
-  TypeDeclaration(d) {
-    d.type = optimize(d.type);
-    return d;
-  },
-  FunctionDeclaration(d) {
-    d.func = optimize(d.func);
-    if (d.body) d.body = d.body.flatMap(optimize);
     return d;
   },
   Increment(s) {
@@ -64,10 +35,7 @@ const optimizers = {
     return s;
   },
   ReturnStatement(s) {
-    s.expression = optimize(s.expression);
-    return s;
-  },
-  ShortReturnStatement(s) {
+    s.exp = optimize(s.exp);
     return s;
   },
   LongIfStatement(s) {
@@ -94,16 +62,6 @@ const optimizers = {
   WhileStatement(s) {
     s.test = optimize(s.test);
     if (s.test === false) {
-      // while false is a no-op
-      return [];
-    }
-    s.body = s.body.flatMap(optimize);
-    return s;
-  },
-  RepeatStatement(s) {
-    s.count = optimize(s.count);
-    if (s.count === 0) {
-      // repeat 0 times is a no-op
       return [];
     }
     s.body = s.body.flatMap(optimize);
@@ -125,7 +83,6 @@ const optimizers = {
     return e;
   },
   BinaryExpression(e) {
-    //e.op = optimize(e.op);
     e.left = optimize(e.left);
     e.right = optimize(e.right);
     if (e.op === "&&") {
@@ -165,7 +122,6 @@ const optimizers = {
     return e;
   },
   UnaryExpression(e) {
-    //e.op = optimize(e.op);
     e.operand = optimize(e.operand);
     if (e.operand.constructor === Number) {
       if (e.op === "-") {

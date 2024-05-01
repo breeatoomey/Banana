@@ -10,11 +10,13 @@ const xmm = core.decrement(x);
 const return1p1 = core.returnStatement(core.binary("+", 1, 1, core.intType));
 const return2 = core.returnStatement(2);
 const returnX = core.returnStatement(x);
+const returnArrayAssignment = core.returnStatement(core.assignment(a, core.arrayExpression([1, 2, 3])));
 const onePlusTwo = core.binary("+", 1, 2, core.intType);
 const identity = Object.assign(core.func("id", core.anyType), { body: returnX });
 const voidInt = core.functionType([], core.intType);
-const intFun = (body) =>
-  core.functionDeclaration("f", core.func("f", voidInt), [], [body]);
+const intFun = body => core.functionDeclaration("f", core.func("f", voidInt), [], [body])
+const arrayFun = (body) =>
+  core.functionDeclaration("f", core.func("f", core.arrayType(core.intType)), [], [body]);
 const callIdentity = (args) => core.functionCall(identity, args);
 const or = (...d) => d.reduce((x, y) => core.binary("||", x, y));
 const and = (...c) => c.reduce((x, y) => core.binary("&&", x, y));
@@ -24,10 +26,7 @@ const times = (x, y) => core.binary("*", x, y);x
 const neg = (x) => core.unary("-", x);
 const array = (...elements) => core.arrayExpression(elements);
 const assign = (v, e) => core.assignment(v, e);
-//const emptyArray = core.emptyArray(core.intType);
-//const sub = (a, e) => core.subscript(a, e);
 const unwrapElse = (o, e) => core.binary("??", o, e);
-//const emptyOptional = core.emptyOptional(core.intType);
 const some = (x) => core.unary("some", x);
 const program = core.program;
 
@@ -80,47 +79,32 @@ const tests = [
     program([core.whileStatement(false, [xpp])]),
     program([]),
   ],
-//   [
-//     "optimizes repeat-0",
-//     program([core.repeatStatement(0, [xpp])]),
-//     program([]),
-//   ],
-  //["optimizes for-range", core.forRangeStatement(x, 5, "...", 3, [xpp]), []],
-  //["optimizes for-empty-array", core.forStatement(x, emptyArray, [xpp]), []],
   [
     "applies if-false after folding",
     core.shortIfStatement(eq(1, 1), [xpp]),
     [xpp],
   ],
-  //["optimizes away nil", unwrapElse(emptyOptional, 3), 3],
   ["optimizes left conditional true", core.conditional(true, 55, 89), 55],
   ["optimizes left conditional false", core.conditional(false, 55, 89), 89],
-  [
-    "optimizes in functions",
-    program([intFun(return1p1)]),
-    program([intFun(return2)]),
-  ],
-  //["optimizes in subscripts", sub(a, onePlusTwo), sub(a, 3)],
+  ["optimizes in functions", program([intFun(return1p1)]), program([intFun(return2)])],
+  ["optimizes in array function declaration", program([arrayFun(returnArrayAssignment)]), program([arrayFun(core.returnStatement(a))])],
   ["optimizes in array literals", array(0, onePlusTwo, 9), array(0, 3, 9)],
   ["optimizes in arguments", callIdentity([times(3, 5)]), callIdentity([15])],
+  ["optimizes in return statements", core.program([return1p1]), core.program([core.returnStatement(2)])],
+  ["optimizes function declaration", core.program([core.functionDeclaration("f", voidInt, [], [return1p1])]), core.program([core.functionDeclaration("f", voidInt, [], [core.returnStatement(2)])])],
+  ["optimizes within function declaration", core.program([core.functionDeclaration("f", voidInt, [], [core.assignment(x, 5), return1p1])]), core.program([core.functionDeclaration("f", voidInt, [], [core.assignment(x, 5), core.returnStatement(2)])])],
+  ["optimizes within body of function declaration", core.program([core.functionDeclaration("f", voidInt, [], [core.assignment(x, 5), return1p1, core.assignment(x, 6)])]), core.program([core.functionDeclaration("f", voidInt, [], core.assignment(x, 5), core.returnStatement(2), core.assignment(x, 6))])],
   [
     "passes through nonoptimizable constructs",
     ...Array(2).fill([
-      //core.program([core.shortReturnStatement()]),
       core.variableDeclaration("x", true, "z"),
-      //core.typeDeclaration([core.field("x", core.intType)]),
       core.assignment(x, core.binary("*", x, "z")),
       core.assignment(x, core.unary("not", x)),
-      //core.constructorCall(identity, core.memberExpression(x, ".", "f")),
-      //core.variableDeclaration("q", false, core.emptyArray(core.floatType)),
-      //core.variableDeclaration("r", false, core.emptyOptional(core.intType)),
       core.whileStatement(true, [core.fullStatement]),
-      //core.repeatStatement(5, [core.returnStatement(1)]),
       core.conditional(x, 1, 2),
       unwrapElse(some(x), 7),
       core.longIfStatement(x, [], []),
       core.shortIfStatement(x, []),
-      //core.forRangeStatement(x, 2, "..<", 5, []),
       core.forStatement(x, array(1, 2, 3), []),
     ]),
   ],

@@ -1,5 +1,5 @@
 pick fibonacci(Int n) -> Int:
     if (n <= 1):
-        serve n
+        serve n|
     else:
-        serve fibonacci(n-1) + fibonacci(n-2)
+        serve fibonacci(n-1) + fibonacci(n-2)||

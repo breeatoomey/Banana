@@ -1,2 +1,2 @@
 pick is_even(Int n) -> Boo:
-    serve n % 2 == 0
+    serve n % 2 == 0 |

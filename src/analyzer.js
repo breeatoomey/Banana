@@ -1,12 +1,7 @@
-// The semantic analyzer exports a single function, analyze(match), that
-// accepts a grammar match object (the CST) from Ohm and produces the
-// internal representation of the program (pretty close to what is usually
-// called the AST). This representation also includes entities from the
-// standard library, as needed.
+// Static Analyzer for the Banana Language
 
 import * as core from "./core.js";
 
-// A few declarations to save typing
 const INT = core.intType;
 const FLOAT = core.floatType;
 const STRING = core.stringType;
@@ -15,12 +10,6 @@ const VOID = core.voidType;
 const ANY = core.anyType;
 
 class Context {
-  // Like most statically-scoped languages, Carlos contexts will contain a
-  // map for their locally declared identifiers and a reference to the parent
-  // context. The parent of the global context is null. In addition, the
-  // context records whether analysis is current within a loop (so we can
-  // properly check break statements), and reference to the current function
-  // (so we can properly check return statements).
   constructor({
     parent = null,
     locals = new Map(),
@@ -46,32 +35,14 @@ class Context {
 }
 
 export default function analyze(match) {
-  // Track the context manually via a simple variable. The initial context
-  // contains the mappings from the standard library. Add to this context
-  // as necessary. When needing to descent into a new scope, create a new
-  // context with the current context as its parent. When leaving a scope,
-  // reset this variable to the parent context.
   let context = Context.root();
 
-  // The single gate for error checking. Pass in a condition that must be true.
-  // Use errorLocation to give contextual information about the error that will
-  // appear: this should be an object whose "at" property is a parse tree node.
-  // Ohm's getLineAndColumnMessage will be used to prefix the error message. This
-  // allows any semantic analysis errors to be presented to an end user in the
-  // same format as Ohm's reporting of syntax errors.
   function must(condition, message, errorLocation) {
     if (!condition) {
       const prefix = errorLocation.at.source.getLineAndColumnMessage();
       throw new Error(`${prefix}${message}`);
     }
   }
-
-  // Next come a number of carefully named utility functions that keep the
-  // analysis code clean and readable. Without these utilities, the analysis
-  // code would be cluttered with if-statements and error messages. Each of
-  // the utilities accept a parameter that should be an object with an "at"
-  // property that is a parse tree node. This is used to provide contextual
-  // information in the error message.
 
   function mustNotAlreadyBeDeclared(name, at) {
     must(!context.lookup(name), `Identifier ${name} already declared`, at);
@@ -105,23 +76,6 @@ export default function analyze(match) {
     must(e.type?.kind === "ArrayType", "Expected an array", at);
   }
 
-  // function mustHaveAnOptionalType(e, at) {
-  //   must(e.type?.kind === "OptionalType", "Expected an optional", at)
-  // }
-
-  // function mustHaveAStructType(e, at) {
-  //   must(e.type?.kind === "StructType", "Expected a struct", at)
-  // }
-
-  // function mustHaveAnOptionalStructType(e, at) {
-  //   // Used to check e?.x expressions, e must be an optional struct
-  //   must(
-  //     e.type?.kind === "OptionalType" && e.type.baseType?.kind === "StructType",
-  //     "Expected an optional struct",
-  //     at
-  //   )
-  // }
-
   function mustBothHaveTheSameType(e1, e2, at) {
     must(
       equivalent(e1.type, e2.type),
@@ -131,8 +85,6 @@ export default function analyze(match) {
   }
 
   function mustAllHaveSameType(expressions, at) {
-    // Used to check the elements of an array expression, and the two
-    // arms of a conditional expression, among other scenarios.
     must(
       expressions
         .slice(1)
@@ -141,19 +93,6 @@ export default function analyze(match) {
       at
     );
   }
-
-  // function mustBeAType(e, at) {
-  //   // This is a rather ugly hack
-  //   must(e?.kind.endsWith("Type"), "Type expected", at)
-  // }
-
-  // function mustBeAnArrayType(t, at) {
-  //   must(t?.kind === "ArrayType", "Must be an array type", at)
-  // }
-
-  // function mustBeAVariable(entity, at) {
-  //   must(entity?.kind === "Variable", `Functions can not appear here`, at)
-  // }
 
   function mustBeAFunction(entity, at) {
     must(entity?.kind === "Function", `${entity.name} is not a function`, at);
@@ -164,35 +103,21 @@ export default function analyze(match) {
       t1 === t2 ||
       (t1?.kind === "ArrayType" &&
         t2?.kind === "ArrayType" &&
-        equivalent(t1.baseType, t2.baseType)) ||
-      (t1?.kind === "FunctionType" &&
-        t2?.kind === "FunctionType" &&
-        equivalent(t1.returnType, t2.returnType) &&
-        t1.paramTypes.length === t2.paramTypes.length &&
-        t1.paramTypes.every((t, i) => equivalent(t, t2.paramTypes[i])))
+        equivalent(t1.baseType, t2.baseType))
     );
   }
 
   function assignable(fromType, toType) {
     return (
       toType == ANY ||
-      equivalent(fromType, toType) ||
-      (fromType?.kind === "FunctionType" &&
-        toType?.kind === "FunctionType" &&
-        assignable(fromType.returnType, toType.returnType) &&
-        fromType.paramTypes.length === toType.paramTypes.length &&
-        toType.paramTypes.every((t, i) =>
-          assignable(t, fromType.paramTypes[i])
-        ))
-    );
+      equivalent(fromType, toType)
+    )
   }
 
   function typeDescription(type) {
     switch (type.kind) {
       case "IntType":
         return "int";
-      // case "FloatType":
-      //   return "float"
       case "StringType":
         return "string";
       case "BoolType":
@@ -201,17 +126,13 @@ export default function analyze(match) {
         return "void";
       case "AnyType":
         return "any";
-      // case "StructType":
-      //   return type.name
       case "FunctionType":
         const paramTypes = type.paramTypes.map(typeDescription).join(", ");
         const returnType = typeDescription(type.returnType);
         return `(${paramTypes})->${returnType}`;
       case "ArrayType":
         return `[${typeDescription(type.base_type)}]`;
-      // case "OptionalType":
-      //   return `${typeDescription(type.base_type)}?`
-    }
+    } 
   }
 
   function mustBeAssignable(e, { toType: type }, at) {
@@ -225,10 +146,6 @@ export default function analyze(match) {
     must(!e.readOnly, `Cannot assign to constant ${e.name}`, at);
   }
 
-  // function mustHaveMember(structType, field, at) {
-  //   must(structType.fields.map(f => f.name).includes(field), "No such field", at)
-  // }
-
   function mustBeInLoop(at) {
     must(context.inLoop, "Full can only appear in a loop", at);
   }
@@ -236,19 +153,6 @@ export default function analyze(match) {
   function mustBeInAFunction(at) {
     must(context.function, "Return can only appear in a function", at);
   }
-
-  // function mustBeCallable(e, at) {
-  //   const callable = e?.kind === "StructType" || e.type?.kind === "FunctionType"
-  //   must(callable, "Call of non-function or non-constructor", at)
-  // }
-
-  // function mustNotReturnAnything(f, at) {
-  //   must(f.type.returnType === VOID, "Something should be returned", at)
-  // }
-
-  // function mustReturnSomething(f, at) {
-  //   must(f.type.returnType !== VOID, "Cannot return a value from this function", at)
-  // }
 
   function mustBeReturnable(e, { from: f }, at) {
     mustBeAssignable(e, { toType: f.type.returnType }, at);
@@ -259,14 +163,7 @@ export default function analyze(match) {
     must(argCount === paramCount, message, at);
   }
 
-  // Building the program representation will be done together with semantic
-  // analysis and error checking. In Ohm, we do this with a semantics object
-  // that has an operation for each relevant rule in the grammar. Since the
-  // purpose of analysis is to build the program representation, we will name
-  // the operations "rep" for "representation". Most of the rules are straight-
-  // forward except for those dealing with function and type declarations,
-  // since types and functions need to be dealt with in two steps to allow
-  // recursion.
+
   const builder = match.matcher.grammar.createSemantics().addOperation("rep", {
     Program(statements) {
       return core.program(statements.children.map((s) => s.rep()));
@@ -282,34 +179,26 @@ export default function analyze(match) {
       type,
       block
     ) {
-      // Start by making the function, but we don't yet know its type.
-      // Also add it to the context so that we can have recursion.
+
       const func = core.func(id.sourceString);
       mustNotAlreadyBeDeclared(id.sourceString, { at: id });
       context.add(id.sourceString, func);
 
-      // Parameters are part of the child context
       context = context.newChildContext({ inLoop: false, function: func });
       const params = parameters.rep();
 
-      // Now that the parameters are known, we compute the function's type.
-      // This is fine; we did not need the type to analyze the parameters,
-      // but we do need to set it before analyzing the body.
       const paramTypes = params.map((param) => param.type);
-      const returnType = type.children?.[0]?.rep() ?? VOID;
+      const returnType = type.children?.[0]?.rep();
       const paramCount = params.length;
       func.type = core.functionType(paramTypes, returnType, paramCount);
 
-      // Analyze body while still in child context
       const body = block.rep();
 
-      // Go back up to the outer context before returning
       context = context.parent;
       return core.functionDeclaration(func, params, body);
     },
 
     Params(param_list) {
-      // Returns a list of variable nodes
       return param_list.asIteration().children.map((p) => p.rep());
     },
 
@@ -345,13 +234,11 @@ export default function analyze(match) {
     },
 
     Body(_open, statements, _close) {
-      // No need for a block node, just return the list of statements
       return statements.children.map((s) => s.rep());
     },
 
     ReturnStmt(return_keyword, exp) {
       mustBeInAFunction({ at: return_keyword });
-      // mustReturnSomething(context.function, { at: return_keyword })
       const return_expression = exp.rep();
       mustBeReturnable(
         return_expression,
@@ -439,10 +326,6 @@ export default function analyze(match) {
     Type_int(_int_keyword) {
       return core.intType;
     },
-
-    // Type_string(_str_keyword) {
-    //   return core.stringType
-    // },
 
     Exp_unary(unaryOp, exp) {
       const [op, operand] = [unaryOp.sourceString, exp.rep()];
@@ -539,17 +422,12 @@ export default function analyze(match) {
     },
 
     Primitive_id(id, _postfix) {
-      // ids used in expressions must have been already declared and must
-      // be bound to variable entities, not function entities.
       const entity = context.lookup(id.sourceString);
       mustHaveBeenFound(entity, id.sourceString, { at: id });
-      //mustBeAVariable(entity, { at: id });
       return entity;
     },
 
     Primitive_call(id, open, expList, _close) {
-      // ids used in calls must have already been declared and must be
-      // bound to function entities, not to variable entities.
       const callee = context.lookup(id.sourceString);
       mustHaveBeenFound(callee, id.sourceString, { at: id });
       mustBeAFunction(callee, { at: id });
@@ -583,11 +461,10 @@ export default function analyze(match) {
     },
 
     stringlit(_openQuote, _chars, _closeQuote) {
-      // Carlos strings will be represented as plain JS strings, including
-      // the quotation marks
       return this.sourceString;
     },
   });
 
   return builder(match).rep();
+
 }

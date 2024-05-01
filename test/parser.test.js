@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import parse from "../src/parser.js";
 
-//TODO: Add tests
 const syntaxChecks = [
   ["all numeric literal forms", "plant(4 * 29.193)"],
   ["complex expressions", "plant(12 * ((((-((((134 / 22)))))))) + 1 - 0)"],
@@ -29,16 +28,8 @@ const syntaxChecks = [
   ["expression as argument in function call", "fibonacci(5 + 2)"],
   ["function composition", "plant(fibonacci(7))"],
   ["multi function composition", "plant(fibonacci(add(5, 7)))"],
-  // ["function composition with method call", "plant(banana.peel(' '))"],
-  // ["function composition with multiple method calls", "plant(banana.peel(' ').eat())"],
-  // ["variable assignment with multiple method calls", "let Boo ate = banana.peel().eat()"]
-  //["model declaration", "model Banana: config(Boo ripeness): self.ripeness = ripeness"],
-  //["method call", "my_banana.eat()"],
-  //["method call with argument", "my_banana.peel('')"],
-  //["variable declaration from method call", "let Bunch(String) words = sentence.peel(' ')"],
 ];
 
-//TODO: Add tests
 const syntaxErrors = [
   ["non-letter in an identifier", "abc😭e = 3", /Line 1, col 4/],
   ["malformed number", "let Int x = 5.", /Line 1, col 15/],
@@ -68,8 +59,6 @@ const syntaxErrors = [
   ["missing functon return type", "func myFunction() -> : ", /Line 1, col 6/],
   ["unclosed string literal", "let String need = 'banana", /Line 1, col 26/],
   ["misplaced operator", "let Int x = 5!", /Line 1, col 14/],
-  // ["unexpected token", "model Person {", /Line 1, col 14/],
-  // ["missing config", "model Banana: pick eat() -> String: serve 'yummy'|", /Line 1, col 15/],
 ];
 
 describe("The parser", () => {

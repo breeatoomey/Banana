@@ -1,4 +1,0 @@
-let String sentence = 'This is a sentence.'
-let Bunch words = sentence.peel(' ')
-plant(words) // output: 0x00007F543210ABCD 
-plant(words!) // output: ['This', 'is', 'a', 'sentence.']

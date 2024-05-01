@@ -12,11 +12,9 @@ Banana {
        | WhileStmt 
        | ForStmt
        
-
   VarDecl = let Type id "=" Exp
   FunDecl = func id "(" Params ")" "->" Type Body
   
-
   Params = ListOf<Param, ",">
   Param = Type id ("=" Exp)?
   Body = ":" Stmt+ "|"
@@ -36,9 +34,9 @@ Banana {
   ForStmt = for id in Exp Body     -- collection
   WhileStmt = while Exp Body
 
-  IfStmt = if Exp Body else Body                  -- long
-         | if Exp Body else IfStmt                -- elsif
-         | if Exp Body                            -- short
+  IfStmt = if Exp Body else Body            -- long
+         | if Exp Body else IfStmt          -- elsif
+         | if Exp Body                      -- short
 
   Exp       = ("-" | "!") Primitive                         -- unary 									
             | Exp1 "?" "->" Exp1 "->>" Exp                  -- ternary
@@ -53,18 +51,17 @@ Banana {
             | Exp5
   Exp5      = Exp5 ("*" | "/" | "%") Exp6                   -- binary
             | Exp6
-  Exp6      = Primitive "**" Exp6                                -- binary
+  Exp6      = Primitive "**" Exp6                           -- binary
             | Primitive
   Primitive = "(" Exp ")" ~mut                            -- parens
-            |"(" NonemptyListOf<Exp, ","> ")"              -- arrayexp
+            |"(" NonemptyListOf<Exp, ","> ")"             -- arrayexp
             | num ~mut                                    -- num
-            | true ~mut              					    -- true
-            | false	~mut							    -- false
-            | id "(" ListOf<Exp, ","> ")" ~mut                 -- call
-            | id "!"?                                      -- id
+            | true ~mut              				   -- true
+            | false	~mut							   -- false
+            | id "(" ListOf<Exp, ","> ")" ~mut            -- call
+            | id "!"?                                     -- id
             | stringlit ~mut                              -- string
-            | void                                    -- void
-
+            | void                                        -- void
 
 
   relop = "<=" | "<" | ">=" | ">" | "==" | "!="

@@ -1,2 +1,2 @@
-    let Boo x = ripe
-    Plant(x ? -> 1 ->> 2)
+let Boo x = ripe
+Plant(x ? -> 1 ->> 2)

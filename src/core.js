@@ -26,14 +26,6 @@ export function functionType(paramTypes, returnType, paramCount) {
   return { kind: "FunctionType", paramTypes, returnType, paramCount };
 }
 
-// export function params(param) {
-//   return { kind: "Params", param };
-// }
-
-// export function param(type, id, exp) {
-//   return { kind: "Param", type, id, exp };
-// }
-
 export function shortIfStatement(test, consequent) {
   return { kind: "ShortIfStatement", test, consequent };
 }
@@ -55,10 +47,6 @@ export function returnStatement(exp) {
 }
 
 export const fullStatement = { kind: "FullStatement" };
-
-// export function callStatement(call) {
-//   return { kind: "CallStatement", call };
-// }
 
 export function functionCall(callee, args) {
   return { kind: "FunctionCall", callee, args, type: callee.type.returnType };
@@ -85,7 +73,7 @@ export function binary(op, left, right, type) {
 }
 
 export function conditional(test, consequent, alternate, type) {
-  return { kind: "Conditional", test, consequent, alternate, type };
+  return { kind: "Conditional", test, consequent, alternate, type }
 }
 
 export function arrayExpression(elements) {
