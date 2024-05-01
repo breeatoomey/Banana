@@ -11,13 +11,13 @@
 - Static Typing
 - Object Oriented
 - Modeling
-- Intrinsic methods
+- Intrinsic Methods
 - Nesting
 - Loops (For, While)
-- Syntactic distinctions between variable references
+- Syntactic Distinctions Between Variable References
 - Function Composition
 
-### Types/Keywords:                                
+### Types/Keywords:
 
 |      JavaScript      |      Banana       |
 | :------------------: | :---------------: |
@@ -28,18 +28,20 @@
 |     constructor      |      config       |
 |       function       |       pick        |
 |        return        |       serve       |
-|        else if       |       elif        |
+|       else if        |       elif        |
 
- ### Intrinsic Methods:
-|      JavaScript                   |      Banana              |
-| :------------------:              | :---------------:        |
-| string.split(separator, limit)    | String.peel(separator)   |
-| console.log()                     | plant()                  |
+### Intrinsic Methods:
+
+|           JavaScript           |         Banana         |
+| :----------------------------: | :--------------------: |
+| string.split(separator, limit) | String.peel(separator) |
+|         console.log()          |        plant()         |
 
 ### Special Operators:
-|      JavaScript       |      Banana             |
-| :------------------:  | :---------------:       |
-| cond ? exp1 : exp2    | cond? -> exp1 ->> exp2  |
+
+|     JavaScript     |         Banana         |
+| :----------------: | :--------------------: |
+| cond ? exp1 : exp2 | cond? -> exp1 ->> exp2 |
 
 ### Examples:
 
@@ -203,7 +205,7 @@ model Person:
 let Person person1 = Person('Alice', 30)
 person1.greet() // Output: Hello, my name is Alice!
 
-```
+````
 
 </td>
 </table>
@@ -237,6 +239,7 @@ pick check-sign(Int num) -> String:
 </table>
 
 #### Elif Statement
+
 <table>
 <tr>
 <td> JavaScript </td> <td> Banana </td>
@@ -246,13 +249,13 @@ pick check-sign(Int num) -> String:
 
 ```javascript
 if (number > 0) {
-    console.log("Number is positive");
+  console.log("Number is positive");
 } else if (number < 0) {
-    console.log("Number is negative");
+  console.log("Number is negative");
 } else {
-    console.log("Number is zero");
+  console.log("Number is zero");
 }
-````
+```
 
 </td>
 <td>
@@ -270,5 +273,4 @@ else:
 </tr>
 </table>
 
-
-### Authors: Breea Toomey, Caroline Ellis, Denali Tonn, Dylan Krim, Maddie Mcdowell
+### Authors: Breea Toomey, Caroline Ellis, Denali Tonn, Dylan Krim, Maddie McDowell
