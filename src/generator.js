@@ -5,6 +5,7 @@ export default function generate(program) {
 
   const standardFunctions = new Map([
     [standardLibrary.Plant, (x) => `console.log(${x})`],
+    [standardLibrary.Banana, (x) => `console.log("bello ${x}")`],
   ]);
 
   const targetName = ((mapping) => {

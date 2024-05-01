@@ -102,4 +102,5 @@ export const standardLibrary = Object.freeze({
   string: stringType,
   any: anyType,
   Plant: func("Plant", functionType([anyType], voidType, 1)),
+  Banana: func("Banana", functionType([stringType], voidType, 1)),
 });
